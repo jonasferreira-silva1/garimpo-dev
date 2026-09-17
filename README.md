@@ -121,13 +121,14 @@ export interface Vaga {
 
 ---
 
-## ⚠️ Pontos de Atenção & Soluções Técnicas
+## 💡 Decisões de Arquitetura & Tratamento de Casos de Borda (Edge Cases)
 
-| Situação Identificada | Diagnóstico / Comportamento API | Solução Implementada |
+| Desafio Técnico | Diagnóstico da API | Solução de Engenharia Implementada |
 | :--- | :--- | :--- |
-| **`redirectLink` quebrado** | API retorna `https://portodigital./vacancies/123` sem o domínio | Função `buildVagaUrl(slug, id)` que gera `https://${slug}.vagas.solides.com.br/vacancies/${id}` |
-| **Salário não informado** | Campo `finalRange === 0` ou `showRangeToApplicant: false` | Função `formatSalary()` exibe `"A combinar"` |
-| **Vagas Recentes** | Data de criação enviada no campo `createdAt` | Função `isNova()` compara diferença de horas (< 48h) para ativar badge |
+| **`redirectLink` Incompleto** | A API retorna URLs com o domínio truncado | Função utilitária `buildVagaUrl()` para construção defensiva da URL |
+| **Tratamento de Salário** | Ausência de faixa salarial ou valor zerado (`finalRange: 0`) | Normalização automática em `formatSalary()` para exibir "A combinar" |
+| **Detecção de Vagas Recentes** | Filtragem temporal baseada no timestamp `createdAt` | Algoritmo em `isNova()` (< 48h) para aplicar badge de destaque visual |
+
 
 ---
 
@@ -233,6 +234,6 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 ---
 
 <p align="center">
-  Desenvolvido com ❤️ em Pernambuco, Brasil 🇧🇷<br/>
+  Desenvolvido com  em Pernambuco, Brasil 🇧🇷<br/>
   <strong>Jonas Ferreira Silva</strong><br/>
 </p>
