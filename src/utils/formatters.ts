@@ -68,5 +68,5 @@ export const formatLocal = (vaga: Vaga): string => {
  */
 export const buildVagaUrl = (slug: string, id: number): string => {
   const empresaSlug = slug || 'portodigital';
-  return `https://${empresaSlug}.vagas.solides.com.br/vacancies/${id}`;
+  return `https://${empresaSlug}.vagas.solides.com.br/vaga/${id}`;
 };

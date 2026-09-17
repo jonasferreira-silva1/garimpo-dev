@@ -123,11 +123,12 @@ export interface Vaga {
 
 ## 💡 Decisões de Arquitetura & Tratamento de Casos de Borda (Edge Cases)
 
-| Desafio Técnico | Diagnóstico da API | Solução de Engenharia Implementada |
+| Desafio Técnico | Diagnóstico da API / Portal | Solução de Engenharia Implementada |
 | :--- | :--- | :--- |
-| **`redirectLink` Incompleto** | A API retorna URLs com o domínio truncado | Função utilitária `buildVagaUrl()` para construção defensiva da URL |
+| **`redirectLink` Truncado & Rota Obsoleta (404)** | API retorna domínio incompleto e a rota legada `/vacancies/` (que dá erro 404 no portal Sólides) | Função utilitária `buildVagaUrl()` que constrói a URL válida `https://${slug}.vagas.solides.com.br/vaga/${id}` |
 | **Tratamento de Salário** | Ausência de faixa salarial ou valor zerado (`finalRange: 0`) | Normalização automática em `formatSalary()` para exibir "A combinar" |
 | **Detecção de Vagas Recentes** | Filtragem temporal baseada no timestamp `createdAt` | Algoritmo em `isNova()` (< 48h) para aplicar badge de destaque visual |
+
 
 
 ---
