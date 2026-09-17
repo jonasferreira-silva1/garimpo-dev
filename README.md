@@ -234,6 +234,6 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 ---
 
 <p align="center">
-  Desenvolvido com  em Pernambuco, Brasil 🇧🇷<br/>
+  Desenvolvido em Pernambuco, Brasil 🇧🇷<br/>
   <strong>Jonas Ferreira Silva</strong><br/>
 </p>
