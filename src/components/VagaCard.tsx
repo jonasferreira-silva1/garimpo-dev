@@ -1,28 +1,35 @@
 /**
- * Garimpo Dev — Componente VagaCard
+ * Garimpo Dev — Componente VagaCard (Sprint 3)
  * 
  * Exibe as informações essenciais de cada vaga em formato de card limpo e responsivo.
- * Aplica as utilidades de formatação de salário, localização, badge "NOVA"
- * e utiliza a URL corrigida para o redirecionamento.
+ * Inclui botão de favoritar vaga (localStorage), visualização de detalhes em modal
+ * e redirecionamento direto para candidatura.
  */
 
 import React from 'react';
-import { Building2, MapPin, DollarSign, ExternalLink, Calendar } from 'lucide-react';
+import { Building2, MapPin, DollarSign, ExternalLink, Calendar, Star, Eye } from 'lucide-react';
 import type { Vaga } from '../types/vaga';
 import { isNova, formatSalary, formatLocal, buildVagaUrl } from '../utils/formatters';
 import { Badge } from './Badge';
 
 interface VagaCardProps {
   vaga: Vaga;
+  isFavorito: boolean;
+  onToggleFavorito: (id: number) => void;
+  onVerDetalhes: (vaga: Vaga) => void;
 }
 
-export const VagaCard: React.FC<VagaCardProps> = ({ vaga }) => {
+export const VagaCard: React.FC<VagaCardProps> = ({
+  vaga,
+  isFavorito,
+  onToggleFavorito,
+  onVerDetalhes,
+}) => {
   const nova = isNova(vaga.createdAt);
   const salarioFormatado = formatSalary(vaga.salary);
   const localFormatado = formatLocal(vaga);
   const urlFinal = buildVagaUrl(vaga.slug, vaga.id);
 
-  // Define a variante da badge baseada na modalidade
   const getModalityVariant = () => {
     if (vaga.homeOffice || vaga.jobType === 'remoto') return 'remoto';
     if (vaga.jobType === 'hibrido') return 'hibrido';
@@ -30,9 +37,9 @@ export const VagaCard: React.FC<VagaCardProps> = ({ vaga }) => {
   };
 
   return (
-    <article className="group bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/40 rounded-xl p-5 transition-all duration-200 flex flex-col justify-between gap-4 shadow-lg hover:shadow-amber-500/5">
+    <article className="group bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/40 rounded-xl p-5 transition-all duration-200 flex flex-col justify-between gap-4 shadow-lg hover:shadow-amber-500/5 relative">
       
-      {/* Cabeçalho do Card (Empresa, Logo e Badges) */}
+      {/* Cabeçalho do Card (Empresa, Logo, Badges e Botão de Favorito) */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {vaga.companyLogo ? (
@@ -41,7 +48,6 @@ export const VagaCard: React.FC<VagaCardProps> = ({ vaga }) => {
               alt={vaga.companyName}
               className="w-11 h-11 rounded-lg object-contain bg-slate-800 p-1 border border-slate-700/50"
               onError={(e) => {
-                // Fallback caso a imagem da logo falhe
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
@@ -62,8 +68,22 @@ export const VagaCard: React.FC<VagaCardProps> = ({ vaga }) => {
           </div>
         </div>
 
-        {/* Badge NOVA se criada nas últimas 48h */}
-        {nova && <Badge variant="nova">✨ NOVA</Badge>}
+        {/* Grupo de Ações Superiores: Badge NOVA + Estrela Favorito */}
+        <div className="flex items-center gap-2 shrink-0">
+          {nova && <Badge variant="nova">✨ NOVA</Badge>}
+          
+          <button
+            onClick={() => onToggleFavorito(vaga.id)}
+            title={isFavorito ? 'Remover dos favoritos' : 'Favoritar vaga'}
+            className={`p-1.5 rounded-lg border transition-colors ${
+              isFavorito
+                ? 'bg-amber-400/20 border-amber-400/40 text-amber-400'
+                : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-amber-400 hover:bg-slate-700'
+            }`}
+          >
+            <Star className={`w-4 h-4 ${isFavorito ? 'fill-amber-400 text-amber-400' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {/* Detalhes da Vaga (Localização, Salário, Data) */}
@@ -86,21 +106,33 @@ export const VagaCard: React.FC<VagaCardProps> = ({ vaga }) => {
         )}
       </div>
 
-      {/* Rótulos e Botão de Ação */}
+      {/* Rótulos e Botões de Ação */}
       <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2 mt-auto">
         <Badge variant={getModalityVariant()}>
           {vaga.jobType ? vaga.jobType.toUpperCase() : 'PRESENCIAL'}
         </Badge>
 
-        <a
-          href={urlFinal}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-md shadow-amber-400/10"
-        >
-          Ver Vaga
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        <div className="flex items-center gap-2">
+          {/* Botão para Abrir Modal de Detalhes */}
+          <button
+            onClick={() => onVerDetalhes(vaga)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5 text-slate-400" />
+            Detalhes
+          </button>
+
+          {/* Botão de Redirecionamento Direto */}
+          <a
+            href={urlFinal}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-md shadow-amber-400/10"
+          >
+            Ver Vaga
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </div>
 
     </article>

@@ -1,9 +1,17 @@
 /**
- * Garimpo Dev — Definições de Tipos TypeScript
+ * Garimpo Dev — Definições de Tipos TypeScript (Sprint 3)
  * 
  * Este arquivo contém todas as interfaces que mapeiam a resposta da API externa da Sólides,
- * garantindo tipagem forte e autocompletar em todo o projeto.
+ * além dos tipos para múltiplos slugs de empresas e sistema de favoritos.
  */
+
+// Slugs mapeados de empresas e hubs no ecossistema
+export const SLUGS_EMPRESAS = [
+  { id: 'todos', label: 'Todas as Empresas', count: 0 },
+  { id: 'portodigital', label: 'Porto Digital (Hub)', count: 0 },
+  { id: 'vsoft', label: 'Vsoft Tecnologia', count: 0 },
+  { id: 'solides', label: 'Sólides Tech', count: 0 },
+] as const;
 
 // Interface para a resposta envelopada da API Sólides
 export interface SolidesResponse {
@@ -49,7 +57,7 @@ export interface Vaga {
   companyName: string;                 // Nome da empresa contratante (ex: "NUCLEO DE GESTAO DO PORTO DIGITAL")
   companyLogo: string;                 // URL do logotipo da empresa
   slug: string;                        // Slug da empresa (ex: "portodigital")
-  redirectLink: string;                // URL original (ATENÇÃO: pode vir com domínio incompleto)
+  redirectLink: string;                // URL original da vaga
   jobType: string;                     // Modelo de trabalho: "presencial" | "remoto" | "hibrido"
   homeOffice: boolean;                 // Booleano indicando se permite Home Office
   openPositions: number;               // Vagas abertas no total
@@ -81,8 +89,10 @@ export interface Vaga {
   }>;
 }
 
-// Interface de Filtros usados na aplicação
+// Interface de Filtros expandida para a Sprint 3
 export interface FiltrosVaga {
-  busca: string;            // Palavra-chave para filtrar pelo título
-  modelo: string;           // "todos" | "remoto" | "hibrido" | "presencial"
+  busca: string;              // Palavra-chave para filtrar pelo título
+  modelo: string;             // "todos" | "remoto" | "hibrido" | "presencial"
+  slugEmpresa: string;        // "todos" | "portodigital" | "vsoft" | "solides"
+  apenasFavoritas: boolean;   // Se deve exibir somente vagas favoritadas pelo usuário
 }

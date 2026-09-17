@@ -1,20 +1,27 @@
 /**
- * Garimpo Dev — Aplicação Principal (App.tsx)
+ * Garimpo Dev — Aplicação Principal (App.tsx - Sprint 3)
  * 
- * Ponto de montagem da interface do Garimpo Dev.
- * Conecta o custom hook `useVagas` aos componentes visuais da aplicação.
+ * Conecta a busca por múltiplos slugs, gerenciamento de favoritos com localStorage,
+ * modal de detalhes de vaga em HTML e controles de paginação e filtros.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { FiltroBar } from './components/FiltroBar';
 import { VagaCard } from './components/VagaCard';
+import { VagaDetalhesModal } from './components/VagaDetalhesModal';
 import { Paginacao } from './components/Paginacao';
 import { EmptyState } from './components/EmptyState';
 import { useVagas } from './hooks/useVagas';
+import { useFavoritos } from './hooks/useFavoritos';
+import type { Vaga } from './types/vaga';
 import { Loader2, Heart } from 'lucide-react';
 
 const App: React.FC = () => {
+  // Gerenciamento de Favoritos no localStorage
+  const { favoritos, toggleFavorito, isFavorito, totalFavoritos } = useFavoritos();
+
+  // Custom Hook de Vagas (conectado à lista de IDs favoritos para filtragem)
   const {
     vagas,
     loading,
@@ -24,11 +31,20 @@ const App: React.FC = () => {
     setPage,
     filtros,
     setFiltros,
+    ultimaAtualizacao,
     recarregar,
-  } = useVagas('portodigital');
+  } = useVagas(favoritos);
+
+  // Estado para controlar a vaga exibida no modal de detalhes
+  const [vagaSelecionada, setVagaSelecionada] = useState<Vaga | null>(null);
 
   const handleLimparFiltros = () => {
-    setFiltros({ busca: '', modelo: 'todos' });
+    setFiltros({
+      busca: '',
+      modelo: 'todos',
+      slugEmpresa: 'todos',
+      apenasFavoritas: false,
+    });
     setPage(1);
   };
 
@@ -36,41 +52,50 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-amber-400 selection:text-slate-950">
       
       {/* Header Principal */}
-      <Header />
+      <Header
+        ultimaAtualizacao={ultimaAtualizacao}
+        onRecarregar={recarregar}
+        loading={loading}
+      />
 
       {/* Conteúdo Principal da Aplicação */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
-        {/* Barra de Busca e Filtros */}
+        {/* Barra de Busca e Filtros Avançados */}
         <FiltroBar
           filtros={filtros}
           onFiltrosChange={(novosFiltros) => {
             setFiltros(novosFiltros);
-            setPage(1); // Volta para a página 1 ao filtrar
+            setPage(1); // Volta para a página 1 ao alterar filtros
           }}
           totalVagas={vagas.length}
+          totalFavoritos={totalFavoritos}
         />
 
-        {/* Estado de Carregamento (Loading Skeleton/Spinner) */}
+        {/* Estado de Carregamento (Loading Spinner) */}
         {loading && (
           <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
             <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
-            <p className="text-xs font-medium">Buscando vagas no ecossistema Porto Digital...</p>
+            <p className="text-xs font-medium">Buscando vagas agregadas em múltiplos slugs da Sólides...</p>
           </div>
         )}
 
-        {/* Estado de Erro na Conexão */}
+        {/* Estado de Erro de Conexão */}
         {!loading && error && (
           <EmptyState
-            mensagem={`Erro de comunicação: ${error}`}
+            mensagem={`Erro de comunicação com a API: ${error}`}
             onLimparFiltros={recarregar}
           />
         )}
 
-        {/* Estado sem Vagas Encontradas */}
+        {/* Estado Sem Vagas Encontradas ou Sem Favoritos */}
         {!loading && !error && vagas.length === 0 && (
           <EmptyState
-            mensagem="Nenhuma vaga corresponde aos critérios de pesquisa selecionados."
+            mensagem={
+              filtros.apenasFavoritas
+                ? 'Você ainda não possui nenhuma vaga salva nos favoritos.'
+                : 'Nenhuma vaga corresponde aos critérios de pesquisa selecionados.'
+            }
             onLimparFiltros={handleLimparFiltros}
           />
         )}
@@ -79,7 +104,13 @@ const App: React.FC = () => {
         {!loading && !error && vagas.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {vagas.map((vaga) => (
-              <VagaCard key={vaga.id} vaga={vaga} />
+              <VagaCard
+                key={vaga.id}
+                vaga={vaga}
+                isFavorito={isFavorito(vaga.id)}
+                onToggleFavorito={toggleFavorito}
+                onVerDetalhes={(v) => setVagaSelecionada(v)}
+              />
             ))}
           </div>
         )}
@@ -97,6 +128,14 @@ const App: React.FC = () => {
         )}
 
       </main>
+
+      {/* Modal de Detalhes da Vaga */}
+      <VagaDetalhesModal
+        vaga={vagaSelecionada}
+        onClose={() => setVagaSelecionada(null)}
+        isFavorito={vagaSelecionada ? isFavorito(vagaSelecionada.id) : false}
+        onToggleFavorito={toggleFavorito}
+      />
 
       {/* Rodapé da Aplicação */}
       <footer className="border-t border-slate-900 bg-slate-900/40 py-6 text-center text-xs text-slate-500">
@@ -118,7 +157,7 @@ const App: React.FC = () => {
               GitHub
             </a>
             <span className="text-slate-700">•</span>
-            <span>Sem backend · Conexão direta API Sólides</span>
+            <span>Sem backend · Agregação Multi-slug Sólides</span>
           </div>
         </div>
       </footer>

@@ -1,12 +1,12 @@
 /**
- * Garimpo Dev — Serviço de Integração HTTP com a API Sólides
+ * Garimpo Dev — Serviço de Integração HTTP com a API Sólides (Sprint 3)
  * 
- * Responsável por realizar as chamadas HTTP diretas para a API pública da Sólides,
- * sem necessidade de backend ou proxy (graças ao CORS aberto da Sólides).
+ * Suporta busca por slug único ou agregação em tempo real de múltiplos slugs
+ * de empresas tech utilizando requisições paralelas com Promise.allSettled.
  */
 
 import axios from 'axios';
-import type { SolidesResponse } from '../types/vaga';
+import type { SolidesResponse, Vaga } from '../types/vaga';
 
 // Endpoint oficial de listagem de vagas da plataforma Sólides
 const SOLIDES_API_BASE_URL = 'https://apigw.solides.com.br/jobs/v3/home/vacancy';
@@ -19,7 +19,7 @@ export interface GetVagasParams {
 }
 
 /**
- * Busca a lista de vagas da plataforma Sólides.
+ * Busca a lista de vagas de um único slug da plataforma Sólides.
  * @param params Parâmetros de consulta (slug, página, quantidade e título)
  * @returns Promessa contendo a estrutura SolidesResponse com a lista de vagas e dados de paginação.
  */
@@ -41,7 +41,71 @@ export const fetchVagasSolides = async ({
 
     return response.data;
   } catch (error) {
-    console.error('Erro ao conectar com a API da Sólides:', error);
+    console.error(`Erro ao conectar com a API da Sólides (slug: ${slug}):`, error);
     throw new Error('Não foi possível carregar as vagas. Verifique sua conexão.');
+  }
+};
+
+/**
+ * RECURSO SPRINT 3: Busca agregada de múltiplos slugs em paralelo.
+ * Realiza chamadas concorrentes usando Promise.allSettled para garantir que,
+ * se um slug falhar, os demais continuem funcionando normalmente.
+ * 
+ * @param slugs Lista de slugs para consultar (ex: ['portodigital', 'vsoft', 'solides'])
+ * @param title Filtro opcional por palavra-chave
+ * @returns Resposta consolidada com todas as vagas combinadas e sem duplicatas.
+ */
+export const fetchVagasMultiplosSlugs = async (
+  slugs: string[],
+  title: string = ''
+): Promise<SolidesResponse> => {
+  try {
+    const promessas = slugs.map((slug) =>
+      axios.get<SolidesResponse>(SOLIDES_API_BASE_URL, {
+        params: {
+          slug,
+          page: 1,
+          take: 24, // Traz mais vagas por slug na agregação
+          title: title.trim(),
+        },
+      })
+    );
+
+    const resultados = await Promise.allSettled(promessas);
+    const todasVagas: Vaga[] = [];
+    let mapaIds = new Set<number>();
+
+    resultados.forEach((res) => {
+      if (res.status === 'fulfilled' && res.value.data?.success && res.value.data?.data?.data) {
+        res.value.data.data.data.forEach((vaga) => {
+          // Evita duplicatas de vagas pelo ID numérico
+          if (!mapaIds.has(vaga.id)) {
+            mapaIds.add(vaga.id);
+            todasVagas.push(vaga);
+          }
+        });
+      }
+    });
+
+    // Ordena as vagas combinadas pela data de criação mais recente
+    todasVagas.sort((a, b) => {
+      const dataA = new Date(a.createdAt || 0).getTime();
+      const dataB = new Date(b.createdAt || 0).getTime();
+      return dataB - dataA;
+    });
+
+    return {
+      success: true,
+      errors: [],
+      data: {
+        totalPages: 1,
+        currentPage: 1,
+        count: todasVagas.length,
+        data: todasVagas,
+      },
+    };
+  } catch (error) {
+    console.error('Erro na busca agregada de múltiplos slugs:', error);
+    throw new Error('Erro ao agregar vagas de múltiplas empresas.');
   }
 };

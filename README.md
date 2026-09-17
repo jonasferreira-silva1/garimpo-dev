@@ -165,6 +165,13 @@ docker build -t garimpo-dev .
 docker run -d -p 8080:80 --name garimpo-app garimpo-dev
 
 # 3. Acessar no navegador: http://localhost:8080
+
+# 4.Para parar: 
+docker stop garimpo-app
+
+# 5. Para reiniciar o container: 
+docker start garimpo-app
+
 ```
 
 ---
@@ -209,7 +216,7 @@ garimpo-dev/
 | :--- | :--- | :--- | :--- |
 | **Semana 1** | 1 semana | **Setup & Core:** Setup React 19 + Vite, Dockerfile, integração API Sólides, tipagem TypeScript, listagem em cards e README.md. | ✅ **Concluído** |
 | **Semana 2** | 1 semana | **Filtros & UX:** Busca em tempo real por título, filtro por modalidade (Remoto/Híbrido/Presencial), badge "NOVA" (<48h) e paginação. | ✅ **Concluído** |
-| **Semana 3** | 1 semana | **Múltiplos Slugs & Favoritos:** Mapeamento de empresas residentes (CESAR, Vsoft, Accenture) e salvamento de vagas favoritas via `localStorage`. | 🔄 *Em andamento* |
+| **Semana 3** | 1 semana | **Múltiplos Slugs & Favoritos:** Mapeamento de empresas residentes (Vsoft, Sólides, etc.), modal de detalhes em HTML e salvamento de favoritas via `localStorage`. | ✅ **Concluído** |
 | **Semana 4** | 1 semana | **Polimento & Portfólio:** Sanitização do HTML de descrição, modal expandido de detalhes, página "Sobre" e deploy contínuo na Vercel. | ⏳ *Planejado* |
 
 ---

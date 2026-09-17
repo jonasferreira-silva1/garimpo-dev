@@ -1,18 +1,22 @@
 /**
- * Garimpo Dev — Custom Hook useVagas
+ * Garimpo Dev — Custom Hook useVagas (Sprint 3)
  * 
- * Este hook encapsula toda a lógica de estado, paginação, filtros e requisição das vagas,
- * permitindo que os componentes visuais permaneçam limpos e focados apenas na renderização.
+ * Encapsula a busca por slug único ou múltiplos slugs agregados, controle de paginação,
+ * estado da última atualização e filtros locais (modalidade, empresa e favoritas).
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Vaga, FiltrosVaga } from '../types/vaga';
-import { fetchVagasSolides } from '../services/solides';
+import { fetchVagasSolides, fetchVagasMultiplosSlugs } from '../services/solides';
 
-export const useVagas = (slugInicial: string = 'portodigital') => {
+// Lista de slugs ativos para agregação em modo "Todas as Empresas"
+const SLUGS_TECH = ['portodigital', 'vsoft', 'solides'];
+
+export const useVagas = (favoritosIds: number[] = []) => {
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState<string>('');
   
   // Estados de controle de paginação
   const [page, setPage] = useState<number>(1);
@@ -23,22 +27,32 @@ export const useVagas = (slugInicial: string = 'portodigital') => {
   const [filtros, setFiltros] = useState<FiltrosVaga>({
     busca: '',
     modelo: 'todos',
+    slugEmpresa: 'todos',
+    apenasFavoritas: false,
   });
 
   /**
    * Função para buscar as vagas na API.
-   * Utiliza useCallback para evitar recriações desnecessárias.
+   * Decide entre busca por slug único ou por múltiplos slugs com base nos filtros.
    */
   const carregarVagas = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchVagasSolides({
-        slug: slugInicial,
-        page,
-        take: 12,
-        title: filtros.busca,
-      });
+      let response;
+
+      if (filtros.slugEmpresa === 'todos') {
+        // Modo Agregado: Busca vagas de todos os slugs mapeados simultaneamente
+        response = await fetchVagasMultiplosSlugs(SLUGS_TECH, filtros.busca);
+      } else {
+        // Modo Específico: Busca vagas de uma empresa/hub específica
+        response = await fetchVagasSolides({
+          slug: filtros.slugEmpresa,
+          page,
+          take: 12,
+          title: filtros.busca,
+        });
+      }
 
       if (response && response.success && response.data) {
         setVagas(response.data.data || []);
@@ -49,24 +63,34 @@ export const useVagas = (slugInicial: string = 'portodigital') => {
         setTotalPages(1);
         setTotalCount(0);
       }
+
+      // Atualiza o horário da última atualização formatado (ex: "15:39:10")
+      const agora = new Date();
+      setUltimaAtualizacao(agora.toLocaleTimeString('pt-BR'));
     } catch (err: any) {
       setError(err.message || 'Erro inesperado ao carregar vagas.');
     } finally {
       setLoading(false);
     }
-  }, [slugInicial, page, filtros.busca]);
+  }, [filtros.slugEmpresa, filtros.busca, page]);
 
-  // Efeito disparado na montagem ou quando muda a página ou busca
+  // Efeito disparado na montagem ou quando muda o filtro de empresa, busca ou página
   useEffect(() => {
     carregarVagas();
   }, [carregarVagas]);
 
-  // Aplicação de filtros locais no lado do cliente (ex: filtro por modelo de trabalho)
+  // Aplicação de filtros locais no lado do cliente (modelo de trabalho e filtro de favoritas)
   const vagasFiltradas = vagas.filter((vaga) => {
-    if (filtros.modelo === 'todos') return true;
+    // Filtro por favoritas
+    if (filtros.apenasFavoritas && !favoritosIds.includes(vaga.id)) {
+      return false;
+    }
+
+    // Filtro por modalidade
     if (filtros.modelo === 'remoto') return vaga.homeOffice || vaga.jobType === 'remoto';
     if (filtros.modelo === 'hibrido') return vaga.jobType === 'hibrido';
     if (filtros.modelo === 'presencial') return !vaga.homeOffice && vaga.jobType === 'presencial';
+    
     return true;
   });
 
@@ -81,6 +105,7 @@ export const useVagas = (slugInicial: string = 'portodigital') => {
     setPage,
     filtros,
     setFiltros,
+    ultimaAtualizacao,
     recarregar: carregarVagas,
   };
 };
