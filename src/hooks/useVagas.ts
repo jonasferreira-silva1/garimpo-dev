@@ -74,9 +74,19 @@ export const useVagas = (favoritosIds: number[] = []) => {
     }
   }, [filtros.slugEmpresa, filtros.busca, page]);
 
-  // Efeito disparado na montagem ou quando muda o filtro de empresa, busca ou página
+  // Efeito disparado na montagem: busca inicial + polling automático de 5 em 5 minutos
   useEffect(() => {
+    // 1. Busca inicial imediata
     carregarVagas();
+
+    // 2. Configura a busca automática a cada 5 minutos (300.000 ms)
+    const INTERVALO_5_MINUTOS = 5 * 60 * 1000;
+    const timerPolling = setInterval(() => {
+      carregarVagas();
+    }, INTERVALO_5_MINUTOS);
+
+    // 3. Limpa o timer ao desmontar o componente ou alterar os filtros principais
+    return () => clearInterval(timerPolling);
   }, [carregarVagas]);
 
   // Aplicação de filtros locais no lado do cliente (modelo de trabalho e filtro de favoritas)

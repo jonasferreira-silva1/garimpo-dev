@@ -26,6 +26,7 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 ## ✨ O que esse projeto entrega
 
 - 🔍 **Monitoramento em Tempo Real:** Conexão direta com a API pública da Sólides, trazendo vagas atualizadas instantaneamente sem necessidade de intermediários ou proxies.
+- ⏱️ **Atualização Automática Periódica (Auto-Polling):** Busca automática a cada 5 minutos (300.000 ms) via `setInterval` no custom hook `useVagas`, mantendo o painel vivo sem recarregar a página.
 - ✨ **Badge "NOVA" Dinâmico:** Identificação visual imediata de oportunidades recém-criadas (há menos de 48 horas).
 - 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/tecnologia e filtragem por trabalho Remoto, Híbrido ou Presencial.
 - 🔗 **Correção do Link de Inscrição:** Normalização automática de URLs da Sólides que contêm o bug de domínio incompleto (`redirectLink`).
@@ -126,6 +127,7 @@ export interface Vaga {
 | Desafio Técnico | Diagnóstico da API / Portal | Solução de Engenharia Implementada |
 | :--- | :--- | :--- |
 | **`redirectLink` Truncado & Rota Obsoleta (404)** | API retorna domínio incompleto e a rota legada `/vacancies/` (que dá erro 404 no portal Sólides) | Função utilitária `buildVagaUrl()` que constrói a URL válida `https://${slug}.vagas.solides.com.br/vaga/${id}` |
+| **Atualização Contínua de Dados (Auto-Polling)** | Necessidade de sincronizar vagas ativas sem forçar F5 no navegador | Timer periódico `setInterval` de 5 minutos (300.000 ms) integrado ao ciclo de vida do React (`useEffect`) com cleanup |
 | **Tratamento de Salário** | Ausência de faixa salarial ou valor zerado (`finalRange: 0`) | Normalização automática em `formatSalary()` para exibir "A combinar" |
 | **Detecção de Vagas Recentes** | Filtragem temporal baseada no timestamp `createdAt` | Algoritmo em `isNova()` (< 48h) para aplicar badge de destaque visual |
 
