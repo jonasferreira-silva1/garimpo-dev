@@ -11,7 +11,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-[🚀 Demo ao Vivo (Em breve — Vercel)](https://garimpo-dev.vercel.app) · [🐛 Reportar Bug](https://github.com/jonasferreira-silva1/garimpo-dev/issues) · [💡 Sugerir Feature](https://github.com/jonasferreira-silva1/garimpo-dev/issues)
+[🚀 Demo ao Vivo — garimpo-dev.vercel.app](https://garimpo-dev.vercel.app) · [🐛 Reportar Bug](https://github.com/jonasferreira-silva1/garimpo-dev/issues) · [💡 Sugerir Feature](https://github.com/jonasferreira-silva1/garimpo-dev/issues)
 
 ---
 
