@@ -1,22 +1,24 @@
 /**
- * Garimpo Dev — Componente Header (Sprint 3)
+ * Garimpo Dev — Componente Header (Sprint 4)
  * 
  * Cabeçalho principal com marca, status de conexão em tempo real,
- * horário da última atualização e botão de recarregar manual.
+ * horário da última atualização, botão de recarregar manual e botão "Sobre o Projeto".
  */
 
 import React from 'react';
-import { Compass, Sparkles, MapPin, RefreshCw } from 'lucide-react';
+import { Compass, Sparkles, MapPin, RefreshCw, Info } from 'lucide-react';
 
 interface HeaderProps {
   ultimaAtualizacao?: string;
   onRecarregar?: () => void;
+  onOpenSobre?: () => void;
   loading?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   ultimaAtualizacao,
   onRecarregar,
+  onOpenSobre,
   loading = false,
 }) => {
   return (
@@ -34,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
                 Garimpo Dev
               </h1>
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
-                v1.5 Sprint 3
+                v2.0 Final
               </span>
             </div>
             <p className="text-xs text-slate-400 flex items-center gap-1">
@@ -44,11 +46,11 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Indicador de Status + Última Atualização + Botão Recarregar */}
+        {/* Indicador de Status + Última Atualização + Botão Recarregar + Botão Sobre */}
         <div className="flex items-center gap-3">
           
           {ultimaAtualizacao && (
-            <span className="text-xs text-slate-400 hidden md:inline">
+            <span className="text-xs text-slate-400 hidden lg:inline">
               Última atualização: <strong className="text-slate-200">{ultimaAtualizacao}</strong>
             </span>
           )}
@@ -64,6 +66,16 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
+          {onOpenSobre && (
+            <button
+              onClick={onOpenSobre}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+            >
+              <Info className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Sobre</span>
+            </button>
+          )}
+
           <div className="flex items-center gap-2 bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-700/60 text-xs">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -71,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
             <span className="text-slate-300 font-medium flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-amber-400" />
-              Multi-API Sólides
+              Radar Tech
             </span>
           </div>
 

@@ -217,7 +217,20 @@ garimpo-dev/
 | **Semana 1** | 1 semana | **Setup & Core:** Setup React 19 + Vite, Dockerfile, integração API Sólides, tipagem TypeScript, listagem em cards e README.md. | ✅ **Concluído** |
 | **Semana 2** | 1 semana | **Filtros & UX:** Busca em tempo real por título, filtro por modalidade (Remoto/Híbrido/Presencial), badge "NOVA" (<48h) e paginação. | ✅ **Concluído** |
 | **Semana 3** | 1 semana | **Múltiplos Slugs & Favoritos:** Mapeamento de empresas residentes (Vsoft, Sólides, etc.), modal de detalhes em HTML e salvamento de favoritas via `localStorage`. | ✅ **Concluído** |
-| **Semana 4** | 1 semana | **Polimento & Portfólio:** Sanitização do HTML de descrição, modal expandido de detalhes, página "Sobre" e deploy contínuo na Vercel. | ⏳ *Planejado* |
+| **Semana 4** | 1 semana | **Polimento & Portfólio:** Radar Tech Multiderivado (Sólides + LinkedIn Recife + GeekHunter/Remotar), Painel de Estatísticas, Skeleton Screens, modal "Sobre" e deploy de produção na Vercel. | ✅ **Concluído** |
+
+---
+
+## 🌐 Deploy de Produção na Vercel
+
+O Garimpo Dev está pronto para deploy contínuo na Vercel em 1 clique:
+
+1. Acesse [vercel.com](https://vercel.com) e faça login com a sua conta do GitHub.
+2. Clique em **"Add New"** → **"Project"**.
+3. Importe o repositório `jonasferreira-silva1/garimpo-dev`.
+4. O Vercel detectará automaticamente as configurações do Vite (`Framework Preset: Vite`).
+5. Clique em **Deploy**. Sua aplicação estará no ar em poucos segundos com a URL `https://garimpo-dev.vercel.app`!
+
 
 ---
 

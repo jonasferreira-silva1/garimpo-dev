@@ -1,8 +1,8 @@
 /**
- * Garimpo Dev — Aplicação Principal (App.tsx - Sprint 3)
+ * Garimpo Dev — Aplicação Principal (App.tsx - Sprint 4 Final)
  * 
- * Conecta a busca por múltiplos slugs, gerenciamento de favoritos com localStorage,
- * modal de detalhes de vaga em HTML e controles de paginação e filtros.
+ * Conecta a busca de vagas por múltiplos slugs, painel de estatísticas,
+ * skeleton screens animadas, radar de fontes tech complementares e modal institucional 'Sobre'.
  */
 
 import React, { useState } from 'react';
@@ -10,12 +10,16 @@ import { Header } from './components/Header';
 import { FiltroBar } from './components/FiltroBar';
 import { VagaCard } from './components/VagaCard';
 import { VagaDetalhesModal } from './components/VagaDetalhesModal';
+import { StatsBar } from './components/StatsBar';
+import { RadarOutrasFontes } from './components/RadarOutrasFontes';
+import { SobreModal } from './components/SobreModal';
+import { VagaSkeleton } from './components/VagaSkeleton';
 import { Paginacao } from './components/Paginacao';
 import { EmptyState } from './components/EmptyState';
 import { useVagas } from './hooks/useVagas';
 import { useFavoritos } from './hooks/useFavoritos';
 import type { Vaga } from './types/vaga';
-import { Loader2, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const App: React.FC = () => {
   // Gerenciamento de Favoritos no localStorage
@@ -38,6 +42,9 @@ const App: React.FC = () => {
   // Estado para controlar a vaga exibida no modal de detalhes
   const [vagaSelecionada, setVagaSelecionada] = useState<Vaga | null>(null);
 
+  // Estado para controlar a exibição do modal 'Sobre o Projeto'
+  const [sobreOpen, setSobreOpen] = useState<boolean>(false);
+
   const handleLimparFiltros = () => {
     setFiltros({
       busca: '',
@@ -55,28 +62,33 @@ const App: React.FC = () => {
       <Header
         ultimaAtualizacao={ultimaAtualizacao}
         onRecarregar={recarregar}
+        onOpenSobre={() => setSobreOpen(true)}
         loading={loading}
       />
 
       {/* Conteúdo Principal da Aplicação */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
+        {/* Painel de Estatísticas em Tempo Real */}
+        {!loading && !error && vagas.length > 0 && <StatsBar vagas={vagas} />}
+
         {/* Barra de Busca e Filtros Avançados */}
         <FiltroBar
           filtros={filtros}
           onFiltrosChange={(novosFiltros) => {
             setFiltros(novosFiltros);
-            setPage(1); // Volta para a página 1 ao alterar filtros
+            setPage(1);
           }}
           totalVagas={vagas.length}
           totalFavoritos={totalFavoritos}
         />
 
-        {/* Estado de Carregamento (Loading Spinner) */}
+        {/* Estado de Carregamento (Skeleton Screens Animados) */}
         {loading && (
-          <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-            <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
-            <p className="text-xs font-medium">Buscando vagas agregadas em múltiplos slugs da Sólides...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <VagaSkeleton key={i} />
+            ))}
           </div>
         )}
 
@@ -127,6 +139,9 @@ const App: React.FC = () => {
           />
         )}
 
+        {/* Componente de Fontes Tech Complementares (LinkedIn Recife, GeekHunter, Remotar) */}
+        <RadarOutrasFontes />
+
       </main>
 
       {/* Modal de Detalhes da Vaga */}
@@ -135,6 +150,12 @@ const App: React.FC = () => {
         onClose={() => setVagaSelecionada(null)}
         isFavorito={vagaSelecionada ? isFavorito(vagaSelecionada.id) : false}
         onToggleFavorito={toggleFavorito}
+      />
+
+      {/* Modal Sobre o Garimpo Dev */}
+      <SobreModal
+        isOpen={sobreOpen}
+        onClose={() => setSobreOpen(false)}
       />
 
       {/* Rodapé da Aplicação */}
@@ -157,7 +178,7 @@ const App: React.FC = () => {
               GitHub
             </a>
             <span className="text-slate-700">•</span>
-            <span>Sem backend · Agregação Multi-slug Sólides</span>
+            <span>Garimpo Dev v2.0 · Porto Digital Recife</span>
           </div>
         </div>
       </footer>
