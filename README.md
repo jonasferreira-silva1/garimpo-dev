@@ -186,24 +186,39 @@ docker start garimpo-app
 garimpo-dev/
 ├── doc/
 │   └── garimpo-dev-docs.pdf      # Especificação completa do projeto
-├── public/                       # Favicon e ícones estáticos
+├── public/                       # Favicon e imagens estáticas
 ├── src/
 │   ├── components/               # Componentes de UI modulares
 │   │   ├── Badge.tsx             # Rótulos para vagas e modalidades
+│   │   ├── CandidaturasView.tsx  # Mini-Kanban do Tracker de Candidaturas
 │   │   ├── EmptyState.tsx        # Estado de lista vazia ou erro
-│   │   ├── FiltroBar.tsx         # Barra de pesquisa e seleção de modalidade
-│   │   ├── Header.tsx            # Cabeçalho com marca e status
+│   │   ├── EventoCard.tsx        # Card individual de evento tech
+│   │   ├── FiltroBar.tsx         # Barra de busca e filtros de vagas
+│   │   ├── FiltroEventos.tsx     # Barra de filtros para eventos tech
+│   │   ├── Header.tsx            # Cabeçalho com abas (Vagas, Eventos, Candidaturas)
 │   │   ├── Paginacao.tsx         # Navegação por páginas
-│   │   └── VagaCard.tsx          # Card individual de exibição da vaga
+│   │   ├── RadarOutrasFontes.tsx # Conectores tech (LinkedIn Recife, GeekHunter, Remotar)
+│   │   ├── SobreModal.tsx        # Modal institucional do projeto
+│   │   ├── StatsBar.tsx          # Painel de estatísticas de vagas
+│   │   ├── StatusSelector.tsx    # Seletor visual de status da candidatura + notas
+│   │   ├── VagaCard.tsx          # Card individual de exibição da vaga
+│   │   ├── VagaDetalhesModal.tsx # Modal de descrição da vaga em HTML
+│   │   └── VagaSkeleton.tsx      # Skeleton screen animado (shimmer)
+│   ├── data/
+│   │   └── eventos.ts            # Base de dados curada de eventos tech em Recife
 │   ├── hooks/
-│   │   └── useVagas.ts           # Custom Hook desacoplado (Estado & Fetch)
+│   │   ├── useCandidaturas.ts   # Custom Hook com localStorage para candidaturas
+│   │   ├── useFavoritos.ts      # Custom Hook com localStorage para favoritos
+│   │   └── useVagas.ts           # Custom Hook com Auto-Polling (5 min) e Multi-slug
 │   ├── services/
 │   │   └── solides.ts            # Serviço de integração HTTP Axios
 │   ├── types/
+│   │   ├── candidatura.ts        # Interfaces e estilos do Tracker de Candidaturas
+│   │   ├── evento.ts             # Interfaces TypeScript de Eventos Tech
 │   │   └── vaga.ts               # Interfaces TypeScript da API Sólides
 │   ├── utils/
-│   │   └── formatters.ts         # Regras de negócio e formatadores
-│   ├── App.tsx                   # Aplicação React principal
+│   │   └── formatters.ts         # Regras de negócio, formatadores e isEstaSemana
+│   ├── App.tsx                   # Aplicação React principal com rotas por aba
 │   ├── index.css                 # Estilos globais Tailwind v4
 │   └── main.tsx                  # Ponto de entrada React DOM
 ├── Dockerfile                    # Multi-stage build (Node -> Nginx Alpine)
