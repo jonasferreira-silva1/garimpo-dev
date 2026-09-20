@@ -16,6 +16,8 @@ export interface Evento {
   linkInscricao: string;     // URL externa para inscrição
   gratuito: boolean;         // Se o evento é gratuito
   organizador?: string;       // ex: "Comunidade React Recife", "CESAR"
+  fonteProcedencia?: string;  // ex: "Portal Oficial Porto Digital", "Sympla PE"
+  mapaUrl?: string;           // URL do Google Maps (opcional)
 }
 
 export interface FiltrosEvento {

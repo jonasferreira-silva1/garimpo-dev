@@ -21,9 +21,10 @@ import { EmptyState } from './components/EmptyState';
 // Componentes da Feature 1 (Eventos) e Feature 2 (Candidaturas)
 import { EVENTOS_TECH_RECIFE } from './data/eventos';
 import { EventoCard } from './components/EventoCard';
+import { EventoDetalhesModal } from './components/EventoDetalhesModal';
 import { FiltroEventos } from './components/FiltroEventos';
 import { CandidaturasView } from './components/CandidaturasView';
-import type { FiltrosEvento } from './types/evento';
+import type { Evento, FiltrosEvento } from './types/evento';
 
 // Custom Hooks
 import { useVagas } from './hooks/useVagas';
@@ -63,6 +64,9 @@ const App: React.FC = () => {
 
   // Estado do Modal de Detalhes da Vaga
   const [vagaSelecionada, setVagaSelecionada] = useState<Vaga | null>(null);
+
+  // Estado do Modal de Detalhes e Procedência do Evento
+  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
 
   // Estado do Modal Sobre
   const [sobreOpen, setSobreOpen] = useState<boolean>(false);
@@ -238,7 +242,11 @@ const App: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {eventosFiltrados.map((evento) => (
-                  <EventoCard key={evento.id} evento={evento} />
+                  <EventoCard
+                    key={evento.id}
+                    evento={evento}
+                    onVerDetalhes={(evt) => setEventoSelecionado(evt)}
+                  />
                 ))}
               </div>
             )}
@@ -267,6 +275,12 @@ const App: React.FC = () => {
         onClose={() => setVagaSelecionada(null)}
         isFavorito={vagaSelecionada ? isFavorito(vagaSelecionada.id) : false}
         onToggleFavorito={toggleFavorito}
+      />
+
+      {/* Modal de Detalhes e Procedência do Evento */}
+      <EventoDetalhesModal
+        evento={eventoSelecionado}
+        onClose={() => setEventoSelecionado(null)}
       />
 
       {/* Modal Sobre o Garimpo Dev */}

@@ -2,20 +2,21 @@
  * Garimpo Dev — Componente EventoCard
  * 
  * Exibe as informações de um evento ou meetup de tecnologia em Recife,
- * incluindo o badge "Esta Semana", modalidade, gratuito/pago e link de inscrição.
+ * permitindo clicar no card para abrir o modal de detalhes e procedência.
  */
 
 import React from 'react';
-import { Calendar, Clock, MapPin, ExternalLink, Ticket, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Ticket, Users, Info } from 'lucide-react';
 import type { Evento } from '../types/evento';
 import { isEstaSemana } from '../utils/formatters';
 import { Badge } from './Badge';
 
 interface EventoCardProps {
   evento: Evento;
+  onVerDetalhes?: (evento: Evento) => void;
 }
 
-export const EventoCard: React.FC<EventoCardProps> = ({ evento }) => {
+export const EventoCard: React.FC<EventoCardProps> = ({ evento, onVerDetalhes }) => {
   const estaSemana = isEstaSemana(evento.data);
 
   const getModalityVariant = () => {
@@ -31,16 +32,27 @@ export const EventoCard: React.FC<EventoCardProps> = ({ evento }) => {
     year: 'numeric',
   });
 
+  const handleCardClick = () => {
+    if (onVerDetalhes) {
+      onVerDetalhes(evento);
+    }
+  };
+
   return (
-    <article className="bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/40 rounded-xl p-5 transition-all duration-200 flex flex-col justify-between gap-4 shadow-lg hover:shadow-amber-500/5">
+    <article
+      onClick={handleCardClick}
+      className={`bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/40 rounded-xl p-5 transition-all duration-200 flex flex-col justify-between gap-4 shadow-lg hover:shadow-amber-500/5 group ${
+        onVerDetalhes ? 'cursor-pointer' : ''
+      }`}
+    >
       
       {/* Cabeçalho do Card (Organizador, Nome e Badges) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           {evento.organizador ? (
             <span className="text-[11px] text-amber-400 font-semibold flex items-center gap-1">
-              <Users className="w-3.5 h-3.5" />
-              {evento.organizador}
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span className="line-clamp-1">{evento.organizador}</span>
             </span>
           ) : (
             <span className="text-[11px] text-slate-400 font-medium">Evento Tech Recife</span>
@@ -54,7 +66,7 @@ export const EventoCard: React.FC<EventoCardProps> = ({ evento }) => {
           </div>
         </div>
 
-        <h3 className="text-base font-bold text-slate-100 line-clamp-2 leading-snug">
+        <h3 className="text-base font-bold text-slate-100 group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
           {evento.nome}
         </h3>
 
@@ -84,25 +96,36 @@ export const EventoCard: React.FC<EventoCardProps> = ({ evento }) => {
           <span className="line-clamp-1">{evento.local}</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Ticket className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span className="font-medium text-emerald-400">
-            {evento.gratuito ? 'Gratuito' : 'Ingresso Pago'}
-          </span>
-          <span className="text-slate-600">•</span>
-          <span className="text-slate-400">{evento.tema}</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Ticket className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="font-medium text-emerald-400">
+              {evento.gratuito ? 'Gratuito' : 'Ingresso Pago'}
+            </span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-400">{evento.tema}</span>
+          </div>
         </div>
       </div>
 
-      {/* Botão de Inscrição Externa */}
-      <div className="pt-2">
+      {/* Ações do Card: Ver Procedência (Modal) e Link Direto de Inscrição */}
+      <div className="pt-2 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={handleCardClick}
+          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg transition-colors border border-slate-700/80"
+        >
+          <Info className="w-3.5 h-3.5 text-amber-400" />
+          Ver Detalhes
+        </button>
+
         <a
           href={evento.linkInscricao}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-md shadow-amber-400/10"
+          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-md shadow-amber-400/10"
         >
-          Garantir Vaga / Inscrever-se
+          Inscrever-se
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
       </div>
