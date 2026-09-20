@@ -27,6 +27,8 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 
 - 🔍 **Monitoramento em Tempo Real:** Conexão direta com a API pública da Sólides, trazendo vagas atualizadas instantaneamente sem necessidade de intermediários ou proxies.
 - ⏱️ **Atualização Automática Periódica (Auto-Polling):** Busca automática a cada 5 minutos (300.000 ms) via `setInterval` no custom hook `useVagas`, mantendo o painel vivo sem recarregar a página.
+- 📅 **Hub de Eventos & Meetups Tech:** Catálogo de eventos de tecnologia em Recife e Porto Digital com badge *"Esta Semana"* (<= 7 dias).
+- 📋 **Tracker de Candidaturas (Kanban):** Gerenciador de processos seletivos com fases (Candidatado, Em Análise, Entrevista, Aprovado, Recusado) e anotações pessoais salvas no `localStorage`.
 - ✨ **Badge "NOVA" Dinâmico:** Identificação visual imediata de oportunidades recém-criadas (há menos de 48 horas).
 - 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/tecnologia e filtragem por trabalho Remoto, Híbrido ou Presencial.
 - 🔗 **Correção do Link de Inscrição:** Normalização automática de URLs da Sólides que contêm o bug de domínio incompleto (`redirectLink`).

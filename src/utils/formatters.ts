@@ -22,6 +22,19 @@ export const isNova = (createdAt: string): boolean => {
 };
 
 /**
+ * Regra de Negócio Eventos: Verifica se o evento ocorrerá nos próximos 7 dias.
+ * @param dataEvento Data do evento em formato ISO "YYYY-MM-DD"
+ * @returns boolean Verdadeiro se o evento for ocorrer nos próximos 7 dias (ou hoje).
+ */
+export const isEstaSemana = (dataEvento: string): boolean => {
+  if (!dataEvento) return false;
+  const data = new Date(dataEvento).getTime();
+  const agora = Date.now();
+  const diferencaDias = (data - agora) / (1000 * 60 * 60 * 24);
+  return diferencaDias >= -1 && diferencaDias <= 7;
+};
+
+/**
  * Regra de Negócio: Formatação do salário da vaga conforme retornado pela API.
  * Trata casos de faixa salarial oculta, negociável ou valor zerado.
  * @param salary Objeto de salário retornado da vaga

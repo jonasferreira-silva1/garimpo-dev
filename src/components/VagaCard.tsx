@@ -1,22 +1,26 @@
 /**
- * Garimpo Dev — Componente VagaCard (Sprint 3)
+ * Garimpo Dev — Componente VagaCard
  * 
  * Exibe as informações essenciais de cada vaga em formato de card limpo e responsivo.
- * Inclui botão de favoritar vaga (localStorage), visualização de detalhes em modal
- * e redirecionamento direto para candidatura.
+ * Inclui botão de favoritar vaga, visualização de detalhes em modal, redirecionamento
+ * para candidatura e o seletor de status do Tracker de Candidaturas.
  */
 
 import React from 'react';
 import { Building2, MapPin, DollarSign, ExternalLink, Calendar, Star, Eye } from 'lucide-react';
 import type { Vaga } from '../types/vaga';
+import type { Candidatura, StatusCandidatura } from '../types/candidatura';
 import { isNova, formatSalary, formatLocal, buildVagaUrl } from '../utils/formatters';
 import { Badge } from './Badge';
+import { StatusSelector } from './StatusSelector';
 
 interface VagaCardProps {
   vaga: Vaga;
   isFavorito: boolean;
   onToggleFavorito: (id: number) => void;
   onVerDetalhes: (vaga: Vaga) => void;
+  candidatura?: Candidatura;
+  onUpdateStatus?: (vagaId: number, status: StatusCandidatura, observacoes?: string) => void;
 }
 
 export const VagaCard: React.FC<VagaCardProps> = ({
@@ -24,6 +28,8 @@ export const VagaCard: React.FC<VagaCardProps> = ({
   isFavorito,
   onToggleFavorito,
   onVerDetalhes,
+  candidatura,
+  onUpdateStatus,
 }) => {
   const nova = isNova(vaga.createdAt);
   const salarioFormatado = formatSalary(vaga.salary);
@@ -105,6 +111,15 @@ export const VagaCard: React.FC<VagaCardProps> = ({
           </div>
         )}
       </div>
+
+      {/* Seletor de Status de Candidatura (Tracker) */}
+      {onUpdateStatus && (
+        <StatusSelector
+          vagaId={vaga.id}
+          candidatura={candidatura}
+          onUpdateStatus={onUpdateStatus}
+        />
+      )}
 
       {/* Rótulos e Botões de Ação */}
       <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2 mt-auto">

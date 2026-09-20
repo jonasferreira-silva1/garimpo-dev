@@ -1,11 +1,12 @@
 /**
- * Garimpo Dev — Aplicação Principal (App.tsx - Sprint 4 Final)
+ * Garimpo Dev — Aplicação Principal (App.tsx)
  * 
- * Conecta a busca de vagas por múltiplos slugs, painel de estatísticas,
- * skeleton screens animadas, radar de fontes tech complementares e modal institucional 'Sobre'.
+ * Conecta o Radar de Vagas Sólides, o Hub de Eventos Tech em Recife e o Tracker de Candidaturas
+ * com salvamento em localStorage, controle de abas e modal sobre o projeto.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import type { AbaNavegacao } from './components/Header';
 import { Header } from './components/Header';
 import { FiltroBar } from './components/FiltroBar';
 import { VagaCard } from './components/VagaCard';
@@ -16,16 +17,37 @@ import { SobreModal } from './components/SobreModal';
 import { VagaSkeleton } from './components/VagaSkeleton';
 import { Paginacao } from './components/Paginacao';
 import { EmptyState } from './components/EmptyState';
+
+// Componentes da Feature 1 (Eventos) e Feature 2 (Candidaturas)
+import { EVENTOS_TECH_RECIFE } from './data/eventos';
+import { EventoCard } from './components/EventoCard';
+import { FiltroEventos } from './components/FiltroEventos';
+import { CandidaturasView } from './components/CandidaturasView';
+import type { FiltrosEvento } from './types/evento';
+
+// Custom Hooks
 import { useVagas } from './hooks/useVagas';
 import { useFavoritos } from './hooks/useFavoritos';
+import { useCandidaturas } from './hooks/useCandidaturas';
 import type { Vaga } from './types/vaga';
 import { Heart } from 'lucide-react';
 
 const App: React.FC = () => {
-  // Gerenciamento de Favoritos no localStorage
+  // Estado da Aba Navegação Ativa ('vagas' | 'eventos' | 'candidaturas')
+  const [abaAtiva, setAbaAtiva] = useState<AbaNavegacao>('vagas');
+
+  // Hook de Favoritos (localStorage)
   const { favoritos, toggleFavorito, isFavorito, totalFavoritos } = useFavoritos();
 
-  // Custom Hook de Vagas (conectado à lista de IDs favoritos para filtragem)
+  // Hook de Candidaturas / Tracker (localStorage)
+  const {
+    candidaturasList,
+    totalCandidaturas,
+    getCandidatura,
+    updateStatus,
+  } = useCandidaturas();
+
+  // Hook de Vagas (API Sólides)
   const {
     vagas,
     loading,
@@ -39,13 +61,54 @@ const App: React.FC = () => {
     recarregar,
   } = useVagas(favoritos);
 
-  // Estado para controlar a vaga exibida no modal de detalhes
+  // Estado do Modal de Detalhes da Vaga
   const [vagaSelecionada, setVagaSelecionada] = useState<Vaga | null>(null);
 
-  // Estado para controlar a exibição do modal 'Sobre o Projeto'
+  // Estado do Modal Sobre
   const [sobreOpen, setSobreOpen] = useState<boolean>(false);
 
-  const handleLimparFiltros = () => {
+  // Estado dos Filtros da Seção de Eventos
+  const [filtrosEvento, setFiltrosEvento] = useState<FiltrosEvento>({
+    busca: '',
+    modalidade: 'todas',
+    tema: 'todos',
+    apenasGratuitos: false,
+  });
+
+  // Mapeamento em memória das vagas para o Tracker
+  const vagasMap = useMemo(() => {
+    const map = new Map<number, Vaga>();
+    vagas.forEach((v) => map.set(v.id, v));
+    return map;
+  }, [vagas]);
+
+  // Filtragem dos Eventos Tech
+  const eventosFiltrados = useMemo(() => {
+    return EVENTOS_TECH_RECIFE.filter((evt) => {
+      // Filtro por busca (nome ou tema)
+      if (filtrosEvento.busca.trim() !== '') {
+        const termo = filtrosEvento.busca.toLowerCase();
+        const noNome = evt.nome.toLowerCase().includes(termo);
+        const noTema = evt.tema.toLowerCase().includes(termo);
+        const naDesc = evt.descricao.toLowerCase().includes(termo);
+        if (!noNome && !noTema && !naDesc) return false;
+      }
+
+      // Filtro por modalidade
+      if (filtrosEvento.modalidade !== 'todas' && evt.modalidade !== filtrosEvento.modalidade) {
+        return false;
+      }
+
+      // Filtro por apenas gratuitos
+      if (filtrosEvento.apenasGratuitos && !evt.gratuito) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [filtrosEvento]);
+
+  const handleLimparFiltrosVagas = () => {
     setFiltros({
       busca: '',
       modelo: 'todos',
@@ -58,8 +121,11 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-amber-400 selection:text-slate-950">
       
-      {/* Header Principal */}
+      {/* Header Principal com Navegação por Abas */}
       <Header
+        abaAtiva={abaAtiva}
+        onAbaChange={setAbaAtiva}
+        totalCandidaturas={totalCandidaturas}
         ultimaAtualizacao={ultimaAtualizacao}
         onRecarregar={recarregar}
         onOpenSobre={() => setSobreOpen(true)}
@@ -69,78 +135,129 @@ const App: React.FC = () => {
       {/* Conteúdo Principal da Aplicação */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
-        {/* Painel de Estatísticas em Tempo Real */}
-        {!loading && !error && vagas.length > 0 && <StatsBar vagas={vagas} />}
+        {/* ============================================== */}
+        {/* VIEW 1: VAGAS TECH (Radar Principal)           */}
+        {/* ============================================== */}
+        {abaAtiva === 'vagas' && (
+          <>
+            {/* Painel de Estatísticas */}
+            {!loading && !error && vagas.length > 0 && <StatsBar vagas={vagas} />}
 
-        {/* Barra de Busca e Filtros Avançados */}
-        <FiltroBar
-          filtros={filtros}
-          onFiltrosChange={(novosFiltros) => {
-            setFiltros(novosFiltros);
-            setPage(1);
-          }}
-          totalVagas={vagas.length}
-          totalFavoritos={totalFavoritos}
-        />
+            {/* Barra de Filtros de Vagas */}
+            <FiltroBar
+              filtros={filtros}
+              onFiltrosChange={(novosFiltros) => {
+                setFiltros(novosFiltros);
+                setPage(1);
+              }}
+              totalVagas={vagas.length}
+              totalFavoritos={totalFavoritos}
+            />
 
-        {/* Estado de Carregamento (Skeleton Screens Animados) */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <VagaSkeleton key={i} />
-            ))}
-          </div>
-        )}
+            {/* Skeleton Screens Animadas */}
+            {loading && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <VagaSkeleton key={i} />
+                ))}
+              </div>
+            )}
 
-        {/* Estado de Erro de Conexão */}
-        {!loading && error && (
-          <EmptyState
-            mensagem={`Erro de comunicação com a API: ${error}`}
-            onLimparFiltros={recarregar}
-          />
-        )}
-
-        {/* Estado Sem Vagas Encontradas ou Sem Favoritos */}
-        {!loading && !error && vagas.length === 0 && (
-          <EmptyState
-            mensagem={
-              filtros.apenasFavoritas
-                ? 'Você ainda não possui nenhuma vaga salva nos favoritos.'
-                : 'Nenhuma vaga corresponde aos critérios de pesquisa selecionados.'
-            }
-            onLimparFiltros={handleLimparFiltros}
-          />
-        )}
-
-        {/* Grid de Cards das Vagas */}
-        {!loading && !error && vagas.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {vagas.map((vaga) => (
-              <VagaCard
-                key={vaga.id}
-                vaga={vaga}
-                isFavorito={isFavorito(vaga.id)}
-                onToggleFavorito={toggleFavorito}
-                onVerDetalhes={(v) => setVagaSelecionada(v)}
+            {/* Estado de Erro de Conexão */}
+            {!loading && error && (
+              <EmptyState
+                mensagem={`Erro de comunicação com a API: ${error}`}
+                onLimparFiltros={recarregar}
               />
-            ))}
+            )}
+
+            {/* Estado Sem Vagas */}
+            {!loading && !error && vagas.length === 0 && (
+              <EmptyState
+                mensagem={
+                  filtros.apenasFavoritas
+                    ? 'Você ainda não possui nenhuma vaga salva nos favoritos.'
+                    : 'Nenhuma vaga corresponde aos critérios de pesquisa selecionados.'
+                }
+                onLimparFiltros={handleLimparFiltrosVagas}
+              />
+            )}
+
+            {/* Grid de Cards de Vagas com Tracker de Candidaturas */}
+            {!loading && !error && vagas.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {vagas.map((vaga) => (
+                  <VagaCard
+                    key={vaga.id}
+                    vaga={vaga}
+                    isFavorito={isFavorito(vaga.id)}
+                    onToggleFavorito={toggleFavorito}
+                    onVerDetalhes={(v) => setVagaSelecionada(v)}
+                    candidatura={getCandidatura(vaga.id)}
+                    onUpdateStatus={updateStatus}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Controle de Paginação */}
+            {!loading && !error && vagas.length > 0 && (
+              <Paginacao
+                paginaAtual={page}
+                totalPaginas={totalPages}
+                onPageChange={(novaPagina) => {
+                  setPage(novaPagina);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            )}
+
+            {/* Fontes Tech Complementares */}
+            <RadarOutrasFontes />
+          </>
+        )}
+
+        {/* ============================================== */}
+        {/* VIEW 2: EVENTOS & PALESTRAS TECH (Networking)  */}
+        {/* ============================================== */}
+        {abaAtiva === 'eventos' && (
+          <div className="space-y-6">
+            <FiltroEventos
+              filtros={filtrosEvento}
+              onFiltrosChange={setFiltrosEvento}
+              totalEventos={eventosFiltrados.length}
+            />
+
+            {eventosFiltrados.length === 0 ? (
+              <EmptyState
+                mensagem="Nenhum evento tech corresponde aos filtros selecionados."
+                onLimparFiltros={() =>
+                  setFiltrosEvento({ busca: '', modalidade: 'todas', tema: 'todos', apenasGratuitos: false })
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {eventosFiltrados.map((evento) => (
+                  <EventoCard key={evento.id} evento={evento} />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Controle de Paginação */}
-        {!loading && !error && vagas.length > 0 && (
-          <Paginacao
-            paginaAtual={page}
-            totalPaginas={totalPages}
-            onPageChange={(novaPagina) => {
-              setPage(novaPagina);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+        {/* ============================================== */}
+        {/* VIEW 3: MINHAS CANDIDATURAS (Tracker)         */}
+        {/* ============================================== */}
+        {abaAtiva === 'candidaturas' && (
+          <CandidaturasView
+            candidaturas={candidaturasList}
+            vagasMap={vagasMap}
+            isFavorito={isFavorito}
+            onToggleFavorito={toggleFavorito}
+            onVerDetalhes={(v) => setVagaSelecionada(v)}
+            onUpdateStatus={updateStatus}
           />
         )}
-
-        {/* Componente de Fontes Tech Complementares (LinkedIn Recife, GeekHunter, Remotar) */}
-        <RadarOutrasFontes />
 
       </main>
 
@@ -178,7 +295,7 @@ const App: React.FC = () => {
               GitHub
             </a>
             <span className="text-slate-700">•</span>
-            <span>Garimpo Dev v2.0 · Porto Digital Recife</span>
+            <span>Garimpo Dev v2.5 · Porto Digital Recife</span>
           </div>
         </div>
       </footer>
