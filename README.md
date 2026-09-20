@@ -6,6 +6,8 @@
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-26_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
@@ -237,6 +239,7 @@ garimpo-dev/
 | **Semana 2** | 1 semana | **Filtros & UX:** Busca em tempo real por título, filtro por modalidade (Remoto/Híbrido/Presencial), badge "NOVA" (<48h) e paginação. | ✅ **Concluído** |
 | **Semana 3** | 1 semana | **Múltiplos Slugs & Favoritos:** Mapeamento de empresas residentes (Vsoft, Sólides, etc.), modal de detalhes em HTML e salvamento de favoritas via `localStorage`. | ✅ **Concluído** |
 | **Semana 4** | 1 semana | **Polimento & Portfólio:** Radar Tech Multiderivado (Sólides + LinkedIn Recife + GeekHunter/Remotar), Painel de Estatísticas, Skeleton Screens, modal "Sobre" e deploy de produção na Vercel. | ✅ **Concluído** |
+| **Semana 5** | 1 semana | **Qualidade & CI/CD:** Suíte de testes automatizados com Vitest (26 testes unitários/integração com Mocks), pipeline de CI/CD automática via GitHub Actions e resiliência de rede com limite de retries. | ✅ **Concluído** |
 
 ---
 
@@ -253,15 +256,18 @@ O Garimpo Dev está pronto para deploy contínuo na Vercel em 1 clique:
 
 ---
 
-## 🧪 Testes e Qualidade de Código
+## 🧪 Testes Automatizados e Qualidade de Código
 
-Para garantir a estabilidade antes de realizar cada commit no repositório GitHub, execute os seguintes testes:
+O projeto possui uma suíte completa de testes automatizados (unitários, integração e componentes com Vitest + Testing Library) e pipeline de CI/CD via GitHub Actions.
 
 ```bash
+# Executar a suíte de testes automatizados (Vitest)
+npm run test
+
 # Executar a verificação de código com Oxlint
 npm run lint
 
-# Validar a compilação do TypeScript
+# Validar a compilação do TypeScript e bundle
 npm run build
 ```
 

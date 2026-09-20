@@ -31,6 +31,9 @@ export const useVagas = (favoritosIds: number[] = []) => {
     apenasFavoritas: false,
   });
 
+  const [retryCount, setRetryCount] = useState<number>(0);
+  const MAX_RETRIES = 3;
+
   /**
    * Função para buscar as vagas na API.
    * Decide entre busca por slug único ou por múltiplos slugs com base nos filtros.
@@ -58,6 +61,7 @@ export const useVagas = (favoritosIds: number[] = []) => {
         setVagas(response.data.data || []);
         setTotalPages(response.data.totalPages || 1);
         setTotalCount(response.data.count || 0);
+        setRetryCount(0); // Reseta contador de tentativas ao obter sucesso
       } else {
         setVagas([]);
         setTotalPages(1);
@@ -68,11 +72,17 @@ export const useVagas = (favoritosIds: number[] = []) => {
       const agora = new Date();
       setUltimaAtualizacao(agora.toLocaleTimeString('pt-BR'));
     } catch (err: any) {
-      setError(err.message || 'Erro inesperado ao carregar vagas.');
+      const mensagemBase = err.message || 'Erro inesperado ao carregar vagas.';
+      if (retryCount < MAX_RETRIES) {
+        setRetryCount((prev) => prev + 1);
+        setError(`${mensagemBase} (Tentativa ${retryCount + 1}/${MAX_RETRIES} de reconexão...)`);
+      } else {
+        setError(`${mensagemBase} Limite máximo de tentativas atingido. Clique em recarregar para tentar novamente.`);
+      }
     } finally {
       setLoading(false);
     }
-  }, [filtros.slugEmpresa, filtros.busca, page]);
+  }, [filtros.slugEmpresa, filtros.busca, page, retryCount]);
 
   // Efeito disparado na montagem: busca inicial + polling automático de 5 em 5 minutos
   useEffect(() => {

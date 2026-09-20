@@ -1,0 +1,34 @@
+name: Garimpo Dev CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Lint, Test & Build Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Executar Linter (Oxlint)
+        run: npm run lint
+
+      - name: Executar Suíte de Testes (Vitest)
+        run: npm run test
+
+      - name: Executar Compilação TypeScript e Build (Vite)
+        run: npm run build
