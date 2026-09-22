@@ -59,10 +59,10 @@ export const VagaDetalhesModal: React.FC<VagaDetalhesModalProps> = ({
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Conteúdo do Modal */}
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col z-10">
+      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] my-auto flex flex-col z-10">
         
         {/* Cabeçalho do Modal */}
-        <div className="p-6 border-b border-slate-800 flex items-start justify-between gap-4 bg-slate-900/90">
+        <div className="p-4 sm:p-6 border-b border-slate-800 flex items-start justify-between gap-3 bg-slate-900/90">
           <div className="flex items-start gap-4">
             {vaga.companyLogo ? (
               <img
