@@ -96,3 +96,10 @@ export interface FiltrosVaga {
   slugEmpresa: string;        // "todos" | "portodigital" | "vsoft" | "solides"
   apenasFavoritas: boolean;   // Se deve exibir somente vagas favoritadas pelo usuário
 }
+
+// Interface para representação do Cache de Vagas em localStorage
+export interface VagasCacheData {
+  vagas: Vaga[];
+  timestamp: number;
+}
+

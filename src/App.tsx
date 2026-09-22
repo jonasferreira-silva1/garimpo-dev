@@ -17,6 +17,7 @@ import { SobreModal } from './components/SobreModal';
 import { VagaSkeleton } from './components/VagaSkeleton';
 import { Paginacao } from './components/Paginacao';
 import { EmptyState } from './components/EmptyState';
+import { CacheBanner } from './components/CacheBanner';
 
 // Componentes da Feature 1 (Eventos) e Feature 2 (Candidaturas)
 import { EVENTOS_TECH_RECIFE } from './data/eventos';
@@ -48,7 +49,7 @@ const App: React.FC = () => {
     updateStatus,
   } = useCandidaturas();
 
-  // Hook de Vagas (API Sólides)
+  // Hook de Vagas (API Sólides com Resiliência de Cache Offline)
   const {
     vagas,
     loading,
@@ -59,6 +60,8 @@ const App: React.FC = () => {
     filtros,
     setFiltros,
     ultimaAtualizacao,
+    isUsingCache,
+    cacheTimestamp,
     recarregar,
   } = useVagas(favoritos);
 
@@ -144,6 +147,15 @@ const App: React.FC = () => {
         {/* ============================================== */}
         {abaAtiva === 'vagas' && (
           <>
+            {/* Banner de Modo Resiliente / Cache Offline */}
+            {isUsingCache && (
+              <CacheBanner
+                cacheTimestamp={cacheTimestamp}
+                onRecarregar={recarregar}
+                loading={loading}
+              />
+            )}
+
             {/* Painel de Estatísticas */}
             {!loading && !error && vagas.length > 0 && <StatsBar vagas={vagas} />}
 
