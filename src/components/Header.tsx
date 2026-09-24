@@ -6,9 +6,9 @@
  */
 
 import React from 'react';
-import { Compass, Sparkles, MapPin, RefreshCw, Info, Briefcase, Calendar, ClipboardList } from 'lucide-react';
+import { Compass, Sparkles, MapPin, RefreshCw, Info, Briefcase, Calendar, ClipboardList, BarChart3 } from 'lucide-react';
 
-export type AbaNavegacao = 'vagas' | 'eventos' | 'candidaturas';
+export type AbaNavegacao = 'vagas' | 'eventos' | 'candidaturas' | 'mercado';
 
 interface HeaderProps {
   abaAtiva: AbaNavegacao;
@@ -162,6 +162,19 @@ export const Header: React.FC<HeaderProps> = ({
                 {totalCandidaturas}
               </span>
             )}
+          </button>
+
+          {/* Aba Radar de Mercado & Analytics (Sprint 7) */}
+          <button
+            onClick={() => onAbaChange('mercado')}
+            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
+              abaAtiva === 'mercado'
+                ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20'
+                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/60'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 shrink-0" />
+            Radar de Mercado
           </button>
 
         </div>

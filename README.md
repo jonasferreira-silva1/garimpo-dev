@@ -6,7 +6,7 @@
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-37_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-44_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -244,6 +244,7 @@ garimpo-dev/
 | **Semana 4** | 1 semana | **Polimento & Portfólio:** Radar Tech Multiderivado (Sólides + LinkedIn Recife + GeekHunter/Remotar), Painel de Estatísticas, Skeleton Screens, modal "Sobre" e deploy de produção na Vercel. | ✅ **Concluído** |
 | **Semana 5** | 1 semana | **Qualidade & CI/CD:** Suíte de testes automatizados com Vitest (26 testes unitários/integração com Mocks), pipeline de CI/CD automática via GitHub Actions e resiliência de rede com limite de retries. | ✅ **Concluído** |
 | **Semana 6** | 1 semana | **Resiliência Offline & Modais:** Cache persistente com fallback automático (expiração 24h), `CacheBanner`, `EventoDetalhesModal` com procedência e suíte expandida para 37 testes automatizados. | ✅ **Concluído** |
+| **Semana 7** | 1 semana | **Motor de Analytics de Mercado:** Dashboard `MercadoInsights.tsx`, parser de 15+ stacks com regex estrito, cálculo de mediana salarial, snapshots diários (`Record<string, MercadoSnapshot>`) e suíte expandida para 44 testes automatizados. | ✅ **Concluído** |
 
 ---
 

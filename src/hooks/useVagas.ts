@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Vaga, FiltrosVaga, VagasCacheData } from '../types/vaga';
 import { fetchVagasSolides, fetchVagasMultiplosSlugs } from '../services/solides';
+import { gerarSnapshotMercado, salvarSnapshotHistorico } from '../utils/mercadoAnalytics';
 
 // Lista de slugs ativos para agregação em modo "Todas as Empresas"
 const SLUGS_TECH = ['portodigital', 'vsoft', 'solides'];
@@ -122,6 +123,10 @@ export const useVagas = (favoritosIds: number[] = []) => {
             timestamp: Date.now(),
           };
           localStorage.setItem(CACHE_KEY, JSON.stringify(snapshot));
+
+          // Salva snapshot de inteligência de mercado diário (Sprint 7)
+          const mercadoSnapshot = gerarSnapshotMercado(listaVagas);
+          salvarSnapshotHistorico(mercadoSnapshot);
         }
       } else {
         setVagas([]);

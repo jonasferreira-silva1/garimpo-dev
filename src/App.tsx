@@ -25,6 +25,7 @@ import { EventoCard } from './components/EventoCard';
 import { EventoDetalhesModal } from './components/EventoDetalhesModal';
 import { FiltroEventos } from './components/FiltroEventos';
 import { CandidaturasView } from './components/CandidaturasView';
+import { MercadoInsights } from './components/MercadoInsights';
 import type { Evento, FiltrosEvento } from './types/evento';
 
 // Custom Hooks
@@ -277,6 +278,13 @@ const App: React.FC = () => {
             onVerDetalhes={(v) => setVagaSelecionada(v)}
             onUpdateStatus={updateStatus}
           />
+        )}
+
+        {/* ============================================== */}
+        {/* VIEW 4: RADAR DE MERCADO & ANALYTICS (Sprint 7)*/}
+        {/* ============================================== */}
+        {abaAtiva === 'mercado' && (
+          <MercadoInsights vagas={vagas} />
         )}
 
       </main>
