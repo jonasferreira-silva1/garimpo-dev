@@ -35,6 +35,7 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 - 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/tecnologia e filtragem por trabalho Remoto, Híbrido ou Presencial.
 - 🔗 **Correção do Link de Inscrição:** Normalização automática de URLs da Sólides que contêm o bug de domínio incompleto (`redirectLink`).
 - 💵 **Tratamento Inteligente de Salários:** Formatação automática de faixas salariais em Real (R$) e rótulo "A combinar" para salários ocultos/negociáveis.
+- 📊 **Radar de Inteligência de Mercado Tech:** Dashboard \`MercadoInsights.tsx\` com análise estatística em tempo real de tecnologias mais demandadas (parser de 15+ stacks via regex estrito), cálculo de média e mediana salarial, distribuição por senioridade e histórico temporal salvo no navegador.
 - 🛡️ **Resiliência Offline & Fallback Cache (Stale-While-Revalidate):** Armazena automaticamente a resposta mais recente no `localStorage` com janela de validade de 24h. Em caso de instabilidade na API externa da Sólides, ativa o modo offline apresentando o banner informativo `CacheBanner` e permitindo reconexões limpas.
 - 🏛️ **Detalhes & Procedência Oficial de Eventos:** Modal dedicado `EventoDetalhesModal` com visualização de fontes verificadas (Sympla, Porto Digital, CESAR, PUG-PE) e mapa direto via Google Maps.
 - 📱 **Interface Responsiva & Glassmorphism:** Design limpo, acessível e otimizado para celulares, tablets e desktops.
@@ -200,7 +201,8 @@ garimpo-dev/
 │   │   ├── EventoCard.tsx        # Card individual de evento tech
 │   │   ├── FiltroBar.tsx         # Barra de busca e filtros de vagas
 │   │   ├── FiltroEventos.tsx     # Barra de filtros para eventos tech
-│   │   ├── Header.tsx            # Cabeçalho com abas (Vagas, Eventos, Candidaturas)
+│   │   ├── Header.tsx            # Cabeçalho com abas (Vagas, Eventos, Candidaturas, Mercado)
+│   │   ├── MercadoInsights.tsx   # Dashboard de inteligência e analytics de mercado
 │   │   ├── Paginacao.tsx         # Navegação por páginas
 │   │   ├── RadarOutrasFontes.tsx # Conectores tech (LinkedIn Recife, GeekHunter, Remotar)
 │   │   ├── SobreModal.tsx        # Modal institucional do projeto
@@ -220,9 +222,11 @@ garimpo-dev/
 │   ├── types/
 │   │   ├── candidatura.ts        # Interfaces e estilos do Tracker de Candidaturas
 │   │   ├── evento.ts             # Interfaces TypeScript de Eventos Tech
+│   │   ├── mercado.ts            # Interfaces TypeScript de Analytics de Mercado
 │   │   └── vaga.ts               # Interfaces TypeScript da API Sólides
 │   ├── utils/
-│   │   └── formatters.ts         # Regras de negócio, formatadores e isEstaSemana
+│   │   ├── formatters.ts         # Regras de negócio, formatadores e isEstaSemana
+│   │   └── mercadoAnalytics.ts   # Motor de analytics, regex de stacks e medianas
 │   ├── App.tsx                   # Aplicação React principal com rotas por aba
 │   ├── index.css                 # Estilos globais Tailwind v4
 │   └── main.tsx                  # Ponto de entrada React DOM
