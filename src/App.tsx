@@ -36,8 +36,17 @@ import type { Vaga } from './types/vaga';
 import { Heart } from 'lucide-react';
 
 const App: React.FC = () => {
-  // Estado da Aba Navegação Ativa ('vagas' | 'eventos' | 'candidaturas')
-  const [abaAtiva, setAbaAtiva] = useState<AbaNavegacao>('vagas');
+  // Estado da Aba Navegação Ativa ('vagas' | 'eventos' | 'candidaturas' | 'mercado')
+  const [abaAtiva, setAbaAtiva] = useState<AbaNavegacao>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const abaParam = params.get('aba');
+      if (abaParam === 'mercado' || abaParam === 'eventos' || abaParam === 'candidaturas' || abaParam === 'vagas') {
+        return abaParam as AbaNavegacao;
+      }
+    }
+    return 'vagas';
+  });
 
   // Hook de Favoritos (localStorage)
   const { favoritos, toggleFavorito, isFavorito, totalFavoritos } = useFavoritos();

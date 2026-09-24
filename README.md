@@ -6,7 +6,7 @@
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-44_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-49_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -35,7 +35,8 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 - 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/tecnologia e filtragem por trabalho Remoto, Híbrido ou Presencial.
 - 🔗 **Correção do Link de Inscrição:** Normalização automática de URLs da Sólides que contêm o bug de domínio incompleto (`redirectLink`).
 - 💵 **Tratamento Inteligente de Salários:** Formatação automática de faixas salariais em Real (R$) e rótulo "A combinar" para salários ocultos/negociáveis.
-- 📊 **Radar de Inteligência de Mercado Tech:** Dashboard \`MercadoInsights.tsx\` com análise estatística em tempo real de tecnologias mais demandadas (parser de 15+ stacks via regex estrito), cálculo de média e mediana salarial, distribuição por senioridade e histórico temporal salvo no navegador.
+- 📊 **Radar de Inteligência de Mercado Tech:** Dashboard `MercadoInsights.tsx` com análise estatística em tempo real de tecnologias mais demandadas (parser de 15+ stacks via regex estrito), cálculo de média e mediana salarial, distribuição por senioridade e histórico temporal salvo no navegador.
+- 📄 **Relatório Público & Exportação para LinkedIn/PDF:** Gerador de relatório institucional formatado em texto resiliente para LinkedIn, visão pronta para impressão/PDF (`@media print`) e modal interativo `RelatorioModal` com deep link via URL (`?aba=mercado`).
 - 🛡️ **Resiliência Offline & Fallback Cache (Stale-While-Revalidate):** Armazena automaticamente a resposta mais recente no `localStorage` com janela de validade de 24h. Em caso de instabilidade na API externa da Sólides, ativa o modo offline apresentando o banner informativo `CacheBanner` e permitindo reconexões limpas.
 - 🏛️ **Detalhes & Procedência Oficial de Eventos:** Modal dedicado `EventoDetalhesModal` com visualização de fontes verificadas (Sympla, Porto Digital, CESAR, PUG-PE) e mapa direto via Google Maps.
 - 📱 **Interface Responsiva & Glassmorphism:** Design limpo, acessível e otimizado para celulares, tablets e desktops.
@@ -205,6 +206,8 @@ garimpo-dev/
 │   │   ├── MercadoInsights.tsx   # Dashboard de inteligência e analytics de mercado
 │   │   ├── Paginacao.tsx         # Navegação por páginas
 │   │   ├── RadarOutrasFontes.tsx # Conectores tech (LinkedIn Recife, GeekHunter, Remotar)
+│   │   ├── RelatorioModal.tsx    # Modal interativo de exportação do relatório
+│   │   ├── RelatorioView.tsx     # Visão institucional de impressão/PDF do relatório
 │   │   ├── SobreModal.tsx        # Modal institucional do projeto
 │   │   ├── StatsBar.tsx          # Painel de estatísticas de vagas
 │   │   ├── StatusSelector.tsx    # Seletor visual de status da candidatura + notas
@@ -212,7 +215,8 @@ garimpo-dev/
 │   │   ├── VagaDetalhesModal.tsx # Modal de descrição da vaga em HTML
 │   │   └── VagaSkeleton.tsx      # Skeleton screen animado (shimmer)
 │   ├── data/
-│   │   └── eventos.ts            # Base de dados curada de eventos tech em Recife
+│   │   ├── eventos.ts            # Base de dados curada de eventos tech em Recife
+│   │   └── fontesTech.ts         # Cadastro de fontes tech verificadas do ecossistema
 │   ├── hooks/
 │   │   ├── useCandidaturas.ts   # Custom Hook com localStorage para candidaturas
 │   │   ├── useFavoritos.ts      # Custom Hook com localStorage para favoritos
@@ -226,7 +230,8 @@ garimpo-dev/
 │   │   └── vaga.ts               # Interfaces TypeScript da API Sólides
 │   ├── utils/
 │   │   ├── formatters.ts         # Regras de negócio, formatadores e isEstaSemana
-│   │   └── mercadoAnalytics.ts   # Motor de analytics, regex de stacks e medianas
+│   │   ├── mercadoAnalytics.ts   # Motor de analytics, regex de stacks e medianas
+│   │   └── relatorioFormatter.ts # Gerador de texto resiliente para LinkedIn e exportação
 │   ├── App.tsx                   # Aplicação React principal com rotas por aba
 │   ├── index.css                 # Estilos globais Tailwind v4
 │   └── main.tsx                  # Ponto de entrada React DOM
@@ -249,6 +254,7 @@ garimpo-dev/
 | **Semana 5** | 1 semana | **Qualidade & CI/CD:** Suíte de testes automatizados com Vitest (26 testes unitários/integração com Mocks), pipeline de CI/CD automática via GitHub Actions e resiliência de rede com limite de retries. | ✅ **Concluído** |
 | **Semana 6** | 1 semana | **Resiliência Offline & Modais:** Cache persistente com fallback automático (expiração 24h), `CacheBanner`, `EventoDetalhesModal` com procedência e suíte expandida para 37 testes automatizados. | ✅ **Concluído** |
 | **Semana 7** | 1 semana | **Motor de Analytics de Mercado:** Dashboard `MercadoInsights.tsx`, parser de 15+ stacks com regex estrito, cálculo de mediana salarial, snapshots diários (`Record<string, MercadoSnapshot>`) e suíte expandida para 44 testes automatizados. | ✅ **Concluído** |
+| **Semana 8** | 1 semana | **Relatório Público & Exportação de Inteligência:** Gerador de texto para LinkedIn (`relatorioFormatter.ts`), visão de impressão/PDF limpa (`RelatorioView.tsx` + `@media print`), cadastro de fontes tech verificadas (`fontesTech.ts`), suporte a deep links (`?aba=mercado`) e suíte expandida para 49 testes automatizados. | ✅ **Concluído** |
 
 ---
 

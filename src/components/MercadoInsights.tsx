@@ -6,7 +6,7 @@
  * níveis de senioridade, faixas salariais e transparência metodológica.
  */
 
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   BarChart3,
   TrendingUp,
@@ -19,6 +19,7 @@ import {
   Building,
   Home,
   RefreshCw,
+  FileText,
 } from 'lucide-react';
 import type { Vaga } from '../types/vaga';
 import {
@@ -27,14 +28,18 @@ import {
   calcularSenioridades,
   calcularSalarioMetricas,
   obterHistoricoMercado,
+  gerarSnapshotMercado,
 } from '../utils/mercadoAnalytics';
 import { formatSalary } from '../utils/formatters';
+import { RelatorioModal } from './RelatorioModal';
 
 interface MercadoInsightsProps {
   vagas: Vaga[];
 }
 
 export const MercadoInsights: React.FC<MercadoInsightsProps> = ({ vagas }) => {
+  const [modalRelatorioOpen, setModalRelatorioOpen] = useState<boolean>(false);
+
   // Processa as estatísticas com useMemo
   const analytics = useMemo(() => {
     const topStacks = extrairTopStacks(vagas);
@@ -91,9 +96,19 @@ export const MercadoInsights: React.FC<MercadoInsightsProps> = ({ vagas }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs shrink-0">
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-300 font-medium">Série Temporal Ativa</span>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+            <button
+              onClick={() => setModalRelatorioOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-colors shadow-md shadow-amber-400/10 cursor-pointer"
+            >
+              <FileText className="w-4 h-4 shrink-0" />
+              Exportar Relatório
+            </button>
+
+            <div className="hidden sm:flex items-center gap-2 bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700/80 text-xs">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span className="text-slate-300 font-medium">Série Temporal Ativa</span>
+            </div>
           </div>
         </div>
 
@@ -333,6 +348,13 @@ export const MercadoInsights: React.FC<MercadoInsightsProps> = ({ vagas }) => {
           </p>
         </div>
       </div>
+
+      {/* Modal de Exportação do Relatório */}
+      <RelatorioModal
+        isOpen={modalRelatorioOpen}
+        onClose={() => setModalRelatorioOpen(false)}
+        snapshot={gerarSnapshotMercado(vagas)}
+      />
 
     </div>
   );
