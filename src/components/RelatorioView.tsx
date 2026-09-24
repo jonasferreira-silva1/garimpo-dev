@@ -35,27 +35,27 @@ export const RelatorioView: React.FC<RelatorioViewProps> = ({ snapshot }) => {
   const { modalidades, senioridades, salarios, topStacks, totalVagas } = snapshot;
 
   return (
-    <div className="bg-slate-900 text-slate-100 p-6 sm:p-8 border border-slate-800 rounded-2xl max-w-3xl mx-auto space-y-6 shadow-2xl print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0">
+    <div className="bg-slate-900 text-slate-100 p-4 sm:p-8 border border-slate-800 rounded-2xl max-w-3xl mx-auto space-y-6 shadow-2xl print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0">
       
       {/* Cabeçalho Institucional do Relatório (Estilizado para Print & Tela) */}
-      <div className="border-b border-slate-800 print:border-slate-300 pb-5 space-y-2">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shrink-0 print:border print:border-slate-400">
-              <Compass className="w-6 h-6" />
+      <div className="border-b border-slate-800 print:border-slate-300 pb-4 sm:pb-5 space-y-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shrink-0 print:border print:border-slate-400">
+              <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold text-slate-100 print:text-slate-900 leading-tight">
+              <h1 className="text-base sm:text-xl font-extrabold text-slate-100 print:text-slate-900 leading-tight">
                 Relatório de Inteligência de Mercado Tech
               </h1>
-              <p className="text-xs text-amber-400 print:text-amber-700 font-semibold flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
+              <p className="text-xs text-amber-400 print:text-amber-700 font-semibold flex items-center gap-1 mt-0.5">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
                 Recife & Ecossistema Porto Digital — Pernambuco, Brasil
               </p>
             </div>
           </div>
 
-          <div className="text-right shrink-0">
+          <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t border-slate-800/60 sm:border-none print:border-none flex sm:block items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
             <span className="text-[10px] text-slate-400 print:text-slate-600 block">Data de Emissão:</span>
             <span className="text-xs font-bold text-slate-200 print:text-slate-900">{dataFormatada}</span>
           </div>

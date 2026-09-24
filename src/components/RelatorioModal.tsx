@@ -72,17 +72,28 @@ export const RelatorioModal: React.FC<RelatorioModalProps> = ({ snapshot, isOpen
       <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col z-10 print:max-h-none print:border-none print:bg-white print:shadow-none print:static">
         
         {/* Cabeçalho de Ações (Oculto na impressão) */}
-        <div className="p-4 border-b border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/90 print:hidden">
-          <div className="flex items-center gap-2 text-slate-100 font-bold text-sm">
-            <FileText className="w-4 h-4 text-amber-400" />
-            <span>Exportar Relatório & Compartilhar</span>
+        <div className="p-3.5 sm:p-4 border-b border-slate-800 space-y-3 bg-slate-900/90 print:hidden">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-slate-100 font-bold text-xs sm:text-sm">
+              <FileText className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Exportar Relatório & Compartilhar</span>
+            </div>
+
+            {/* Botão Fechar Modal */}
+            <button
+              onClick={onClose}
+              aria-label="Fechar modal de relatório"
+              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors shrink-0"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-0.5 sm:pb-0">
             {/* Botão Copiar Texto para LinkedIn */}
             <button
               onClick={handleCopiarLinkedin}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all shrink-0 ${
                 copiadoTexto
                   ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                   : 'bg-amber-400 text-slate-950 border-amber-400 hover:bg-amber-300 shadow-md shadow-amber-400/10'
@@ -95,7 +106,7 @@ export const RelatorioModal: React.FC<RelatorioModalProps> = ({ snapshot, isOpen
             {/* Botão Copiar Link Direto */}
             <button
               onClick={handleCopiarLink}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all shrink-0 ${
                 copiadoLink
                   ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                   : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'
@@ -108,19 +119,10 @@ export const RelatorioModal: React.FC<RelatorioModalProps> = ({ snapshot, isOpen
             {/* Botão Imprimir / Salvar PDF */}
             <button
               onClick={handleImprimir}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors shrink-0"
             >
               <Printer className="w-3.5 h-3.5 text-sky-400" />
               Imprimir / PDF
-            </button>
-
-            {/* Botão Fechar Modal */}
-            <button
-              onClick={onClose}
-              aria-label="Fechar modal de relatório"
-              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
