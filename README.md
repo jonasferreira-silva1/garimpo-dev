@@ -227,8 +227,10 @@ garimpo-dev/
 │   │   ├── useCandidaturas.ts   # Custom Hook com localStorage para candidaturas
 │   │   ├── useFavoritos.ts      # Custom Hook com localStorage para favoritos
 │   │   └── useVagas.ts           # Custom Hook com Auto-Polling (5 min) e Multi-slug
+│   ├── schemas/
+│   │   └── solidesSchema.ts      # Schemas de validação runtime Zod para resposta da API
 │   ├── services/
-│   │   └── solides.ts            # Serviço de integração HTTP Axios
+│   │   └── solides.ts            # Serviço de integração HTTP Axios com Zod safeParse
 │   ├── types/
 │   │   ├── candidatura.ts        # Interfaces e estilos do Tracker de Candidaturas
 │   │   ├── diario.ts             # Interfaces TypeScript para ADRs e Telemetria
