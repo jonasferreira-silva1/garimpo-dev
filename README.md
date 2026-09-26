@@ -7,41 +7,57 @@
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Vitest](https://img.shields.io/badge/Vitest-66_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Zod Schema](https://img.shields.io/badge/Zod-Runtime_Validated-3E67B1?style=flat-square&logo=zod)](https://zod.dev/)
 [![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-[🚀 Demo ao Vivo — garimpo-dev.vercel.app](https://garimpo-dev.vercel.app) · [🐛 Reportar Bug](https://github.com/jonasferreira-silva1/garimpo-dev/issues) · [💡 Sugerir Feature](https://github.com/jonasferreira-silva1/garimpo-dev/issues)
+[🚀 Demo ao Vivo — garimpo-dev.vercel.app](https://garimpo-dev.vercel.app) · [📖 Artigo Técnico de Bastidores (Dev.to / LinkedIn)](doc/diario-tecnico-artigo.md) · [🐛 Reportar Bug](https://github.com/jonasferreira-silva1/garimpo-dev/issues)
 
 ---
 
-## 🌎 O Contexto
+## 📖 A História do Projeto & Metodologia de Engenharia
 
-O **Porto Digital** (Recife/PE) é um dos principais parques tecnológicos e polos de inovação da América Latina, abrigando centenas de empresas de tecnologia, startups e centros de P&D.
+O **Porto Digital** (Recife/PE) é um dos maiores parques tecnológicos e polos de inovação da América Latina, abrigando centenas de empresas de tecnologia, startups e centros de P&D.
 
-Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada costuma ser difícil devido à pulverização de anúncios e sistemas legados de RH. O **Garimpo Dev** nasce como uma ferramenta web responsiva e ultrarrápida para monitorar e consolidar em tempo real as vagas tech publicadas na plataforma Sólides para o Porto Digital e empresas parceiras do ecossistema de Recife.
+Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada costumava ser difícil devido à pulverização de anúncios e sistemas legados de RH. O **Garimpo Dev** nasceu como um projeto pessoal para resolver essa dor real, agregando vagas tech diretamente da API pública da Sólides em uma interface responsiva, ultrarrápida e sem custo de servidores.
+
+### 🤖 Bastidores de Engenharia: Pair-Programming com AI Agentic
+O projeto foi construído utilizando metodologia de **Engenharia Pair-Programming com Assistente de IA Agentic**, em ciclos iterativos de desenvolvimento. Enquanto o desenvolvedor liderava o direcionamento de produto, visão de negócios, decisões de arquitetura e revisão rigorosa de código, a IA auxiliava na aceleração da escrita de componentes React, schemas Zod, algoritmos estatísticos e suítes de testes automatizados no Vitest.
 
 ---
 
-## ✨ O que esse projeto entrega
+## ⚠️ Limitações Conhecidas & Transparência de Escopo
 
-- 🔍 **Monitoramento em Tempo Real:** Conexão direta com a API pública da Sólides, trazendo vagas atualizadas instantaneamente sem necessidade de intermediários ou proxies.
-- ⏱️ **Atualização Automática Periódica (Auto-Polling):** Busca automática a cada 5 minutos (300.000 ms) via `setInterval` no custom hook `useVagas`, mantendo o painel vivo sem recarregar a página.
-- 📅 **Hub de Eventos & Meetups Tech:** Catálogo de eventos de tecnologia em Recife e Porto Digital com badge *"Esta Semana"* (<= 7 dias).
-- 📋 **Tracker de Candidaturas (Kanban):** Gerenciador de processos seletivos com fases (Candidatado, Em Análise, Entrevista, Aprovado, Recusado) e anotações pessoais salvas no `localStorage`.
-- ✨ **Badge "NOVA" Dinâmico:** Identificação visual imediata de oportunidades recém-criadas (há menos de 48 horas).
-- 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/tecnologia e filtragem por trabalho Remoto, Híbrido ou Presencial.
-- 🔗 **Correção do Link de Inscrição:** Normalização automática de URLs da Sólides que contêm o bug de domínio incompleto (`redirectLink`).
-- 💵 **Tratamento Inteligente de Salários:** Formatação automática de faixas salariais em Real (R$) e rótulo "A combinar" para salários ocultos/negociáveis.
-- 📊 **Radar de Inteligência de Mercado Tech:** Dashboard `MercadoInsights.tsx` com análise estatística em tempo real de tecnologias mais demandadas (parser de 15+ stacks via regex estrito), cálculo de média e mediana salarial, distribuição por senioridade e histórico temporal salvo no navegador.
-- 📄 **Relatório Público & Exportação para LinkedIn/PDF:** Gerador de relatório institucional formatado em texto resiliente para LinkedIn, visão pronta para impressão/PDF (`@media print`) e modal interativo `RelatorioModal` com deep link via URL (`?aba=mercado`).
-- 📓 **Diário Técnico & Bastidores de Engenharia (ADRs):** Central interativa `DiarioTecnicoModal.tsx` com 6 Architecture Decision Records (ADRs), telemetria viva no cliente (`ArquiteturaDiagrama.tsx`) e artigo técnico em 1ª pessoa exportável em Markdown (`doc/diario-tecnico-artigo.md`) pronto para Dev.to/LinkedIn.
-- 🛡️ **Validação de Schema Runtime com Zod:** Validação defensiva de tipos e contrato HTTP da API Sólides (`solidesSchema.ts` + `solidesResponseSchema.safeParse()`), capturando alterações de esquema no cliente e ativando resiliência.
-- 🛡️ **Resiliência Offline & Fallback Cache (Stale-While-Revalidate):** Armazena automaticamente a resposta mais recente no `localStorage` com janela de validade de 24h. Em caso de instabilidade na API externa da Sólides, ativa o modo offline apresentando o banner informativo `CacheBanner` e permitindo reconexões limpas.
-- 🏛️ **Detalhes & Procedência Oficial de Eventos:** Modal dedicado `EventoDetalhesModal` com visualização de fontes verificadas (Sympla, Porto Digital, CESAR, PUG-PE) e mapa direto via Google Maps.
-- 📱 **Interface Responsiva & Glassmorphism:** Design limpo, acessível e otimizado para celulares, tablets e desktops.
+Em respeito à transparência de engenharia que norteia este projeto, destacamos as limitações pragmáticas da solução:
+
+1. **Dependência de Fonte Única:** O radar de vagas consome prioritariamente o API Gateway público da plataforma Sólides (empresas do Porto Digital e parceiras). O app não possui robôs de *web scraping* não autorizados em redes fechadas.
+2. **Curadoria Manual de Eventos:** O hub de eventos tech possui atualização periódica com data de verificação explicita na interface (`DATA_ULTIMA_CURADORIA_EVENTOS`), garantindo procedência sem exibir informações desatualizadas.
+3. **Arquitetura 100% Client-Side:** Para manter custo R$ 0,00 de infraestrutura, o Garimpo Dev não utiliza banco de dados próprio backend. As candidaturas e vagas favoritadas são persistidas localmente no `localStorage` do navegador do usuário.
+4. **Foco e Alcance Regional:** A ferramenta foi desenhada especificamente para o ecossistema de TI de Pernambuco (Recife e região metropolitana).
+
+---
+
+## ✨ Funcionalidades Entregues
+
+### 🎯 Core do Produto (Vagas & Tracker)
+- 🔍 **Monitoramento em Tempo Real:** Conexão direta com a API pública da Sólides sem necessidade de proxies.
+- ⏱️ **Auto-Polling Reativo (5 min):** Atualização automática sem necessidade de recarregar a página.
+- 📋 **Tracker de Candidaturas (Mini-Kanban):** Gerenciador de processos seletivos (Candidatado, Em Análise, Entrevista, Aprovado, Recusado) salvo via `localStorage`.
+- 🏷️ **Filtros por Modalidade & Palavra-chave:** Busca por cargo/stack e filtragem por Remoto, Híbrido ou Presencial.
+- ✨ **Badge "NOVA" Dinâmico:** Destaque visual automático para vagas criadas há menos de 48 horas.
+- 💵 **Tratamento Inteligente de Salários:** Normalização de valores em Reais (R$) e rótulo "A combinar" para salários negociáveis.
+
+### 📊 Inteligência de Mercado & Relatórios
+- 📊 **Radar de Mercado Tech:** Dashboard `MercadoInsights.tsx` com amostragem estatística em tempo real de tecnologias mais pedidas (parser de 15+ stacks por regex estrito `\b`), distribuição por senioridade e cálculo de mediana salarial.
+- 📄 **Relatório Institucional & PDF (`@media print`):** Visão formatada em A4 pronta para impressão/PDF nativa sem dependências pesadas, e gerador de resumo para o LinkedIn com deep link (`?aba=mercado`).
+- 📅 **Hub de Eventos Tech:** Agenda curada com badge de procedência oficial (Sympla, Porto Digital, CESAR, PUG-PE) e mapa direto via Google Maps.
+
+### 🛡️ Engenharia, Resiliência & Bastidores
+- 🛡️ **Validação de Schema Runtime com Zod:** Schema defensivo (`solidesSchema.ts`) que valida a estrutura HTTP da API no client sem quebrar a aplicação em caso de mudanças de contrato.
+- 🛡️ **Resiliência Offline (Stale-While-Revalidate):** Fallback automático para `localStorage` com validade de 24h em caso de queda de conexão (`CacheBanner`).
+- 📓 **Diário Técnico & Central de ADRs:** Modal interativo (`DiarioTecnicoModal.tsx`) contendo 6 Architecture Decision Records (ADRs) reais do projeto e telemetria viva (`ArquiteturaDiagrama.tsx`).
 
 ---
 
@@ -63,17 +79,16 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Fluxo de Dados em Tempo Real
+### Decisões de Arquitetura & Tratamento de Edge Cases (ADRs)
 
-```text
-[Usuário Acessa/Filtra] ──► [useVagas Hook] ──► [solides.ts (Axios)]
-                                                         │
-[Renderiza Vagas Cards] ◄── [formatters.ts] ◄── [Resposta JSON API]
- (Trata URL, Salário e Nova)
-```
-
-> [!NOTE]
-> **Arquitetura Zero-Backend:** Testes de rede confirmaram que a API Gateway da Sólides permite chamadas diretas via CORS a partir do navegador. Essa decisão de arquitetura elimina custos de infraestrutura backend, simplifica a manutenção e garante hospedagem 100% gratuita na Vercel/Netlify.
+| Desafio Técnico | Diagnóstico da API / Portal | Solução de Engenharia Implementada (ADR) |
+| :--- | :--- | :--- |
+| **`redirectLink` Truncado (404)** | API retorna domínio incompleto e a rota legada `/vacancies/` | Função utilitária `buildVagaUrl()` constrói a URL válida `https://${slug}.vagas.solides.com.br/vaga/${id}` |
+| **Arquitetura Zero-Backend** | Desejo de eliminar custos de servidores intermediários | Identificação do header HTTP `Access-Control-Allow-Origin: *` na API Sólides, permitindo chamadas diretas via browser |
+| **Parser de Stacks por Texto** | Buscas simples por string geravam falsos positivos em "Go", "R", "C" | Expressões regulares estritas com delimitadores de palavra `\b` (word boundaries) em `mercadoAnalytics.ts` |
+| **Outliers Salariais** | Vagas de especialistas (R$ 20k+) distorciam a média em +30% | Adota a **Mediana Salarial** como métrica primária e mais honesta do mercado local |
+| **Exportação em PDF** | Necessidade de PDF sem inchar o bundle em +350 KB | Estilização utilitária `@media print` acionando o `window.print()` nativo do navegador |
+| **Divergência de Schema HTTP** | Alterações não avisadas na API externa | Validação de schema runtime com Zod (`solidesResponseSchema.safeParse()`) ativando o fallback de cache offline |
 
 ---
 
@@ -82,110 +97,12 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 | Camada | Tecnologia | Por quê |
 | :--- | :--- | :--- |
 | **Frontend** | React 19 + TypeScript | Interface reativa, tipagem estática rigorosa e desacoplamento |
+| **Validation** | Zod | Validação de schema em runtime para respostas HTTP da API externa |
 | **Build Tool** | Vite 8 | Fast HMR, compilação ultrarrápida e bundle otimizado |
 | **Estilização** | Tailwind CSS v4 | Design system utilitário, temas escuros e alta performance |
-| **Ícones** | Lucide React | Biblioteca de ícones vetoriais leve e consistente |
-| **HTTP Client** | Axios | Cliente HTTP robusto com tratamento de erros |
-| **Container** | Docker + Nginx Alpine | Imagem multi-stage leve para ambiente reprodutível e produção |
+| **Testes & Coverage** | Vitest + Testing Library + V8 | Suíte de 66 testes automatizados com relatório de cobertura |
 | **Linter** | Oxlint | Linter em Rust ultrarrápido para garantia de código limpo |
-| **Deploy** | Vercel / Netlify | Deploy contínuo automático integrado ao repositório GitHub |
-
----
-
-## 📡 Documentação da API Sólides (Schema Real)
-
-### Endpoint
-`GET https://apigw.solides.com.br/jobs/v3/home/vacancy`
-
-### Parâmetros Suportados
-
-| Parâmetro | Tipo | Obrigatório | Descrição |
-| :--- | :--- | :--- | :--- |
-| `slug` | `string` | **Sim** | Identificador do hub ou empresa (ex: `portodigital`) |
-| `take` | `number` | **Sim** | Quantidade de vagas por página (ex: `12`) |
-| `page` | `number` | **Sim** | Número da página atual (começa em `1`) |
-| `title` | `string` | Não | Filtro por palavra-chave no título do cargo |
-
-### Interface TypeScript do Schema (`src/types/vaga.ts`)
-
-```typescript
-export interface Vaga {
-  id: number;
-  title: string;
-  description: string;       // HTML encodado
-  companyName: string;
-  companyLogo: string;
-  slug: string;
-  redirectLink: string;      // ⚠️ Domínio incompleto retornado pela API
-  jobType: string;           // "presencial" | "remoto" | "hibrido"
-  homeOffice: boolean;
-  createdAt: string;         // YYYY-MM-DD
-  salary: {
-    showRangeToApplicant: boolean;
-    finalRange: number;
-    negotiable: boolean;
-  };
-  city: { name: string };
-  state: { code: string };
-}
-```
-
----
-
-## 💡 Decisões de Arquitetura & Tratamento de Casos de Borda (Edge Cases)
-
-| Desafio Técnico | Diagnóstico da API / Portal | Solução de Engenharia Implementada |
-| :--- | :--- | :--- |
-| **`redirectLink` Truncado & Rota Obsoleta (404)** | API retorna domínio incompleto e a rota legada `/vacancies/` (que dá erro 404 no portal Sólides) | Função utilitária `buildVagaUrl()` que constrói a URL válida `https://${slug}.vagas.solides.com.br/vaga/${id}` |
-| **Atualização Contínua de Dados (Auto-Polling)** | Necessidade de sincronizar vagas ativas sem forçar F5 no navegador | Timer periódico `setInterval` de 5 minutos (300.000 ms) integrado ao ciclo de vida do React (`useEffect`) com cleanup |
-| **Tratamento de Salário** | Ausência de faixa salarial ou valor zerado (`finalRange: 0`) | Normalização automática em `formatSalary()` para exibir "A combinar" |
-| **Detecção de Vagas Recentes** | Filtragem temporal baseada no timestamp `createdAt` | Algoritmo em `isNova()` (< 48h) para aplicar badge de destaque visual |
-| **Resiliência de Rede & Off-line** | API indisponível ou queda de conexão do usuário | Retry com limite de 3 tentativas e fallback de cache no `localStorage` (`VagasCacheData` com expiração de 24h) |
-
-
-
----
-
-## 🚀 Rodando Localmente
-
-### Pré-requisitos
-- **Node.js:** `v20.x` ou superior
-- **Docker Desktop:** `v24+` *(opcional, caso queira rodar via container)*
-
-### Passo a Passo (Node.js)
-
-```bash
-# 1. Clonar o repositório
-git clone https://github.com/jonasferreira-silva1/garimpo-dev.git
-cd garimpo-dev
-
-# 2. Instalar as dependências
-npm install
-
-# 3. Executar o servidor de desenvolvimento
-npm run dev
-
-# 4. Acessar no navegador: http://localhost:5173
-```
-
-### Rodando via Docker Container 🐳
-
-```bash
-# 1. Construir a imagem Docker
-docker build -t garimpo-dev .
-
-# 2. Executar o container na porta 8080
-docker run -d -p 8080:80 --name garimpo-app garimpo-dev
-
-# 3. Acessar no navegador: http://localhost:8080
-
-# 4.Para parar: 
-docker stop garimpo-app
-
-# 5. Para reiniciar o container: 
-docker start garimpo-app
-
-```
+| **Deploy** | Vercel | Hospedagem de produção com deploy contínuo integrado ao GitHub |
 
 ---
 
@@ -206,7 +123,7 @@ garimpo-dev/
 │   │   ├── EmptyState.tsx        # Estado de lista vazia ou erro
 │   │   ├── EventoCard.tsx        # Card individual de evento tech
 │   │   ├── FiltroBar.tsx         # Barra de busca e filtros de vagas
-│   │   ├── FiltroEventos.tsx     # Barra de filtros para eventos tech
+│   │   ├── FiltroEventos.tsx     # Barra de filtros para eventos tech (com data de curadoria)
 │   │   ├── Header.tsx            # Cabeçalho com abas e botão "Bastidores & ADRs"
 │   │   ├── MercadoInsights.tsx   # Dashboard de inteligência e analytics de mercado
 │   │   ├── Paginacao.tsx         # Navegação por páginas
@@ -245,55 +162,27 @@ garimpo-dev/
 │   ├── index.css                 # Estilos globais Tailwind v4
 │   └── main.tsx                  # Ponto de entrada React DOM
 ├── Dockerfile                    # Multi-stage build (Node -> Nginx Alpine)
-├── .dockerignore                 # Exclusões do contexto Docker
 ├── vite.config.ts                # Configuração do Vite com Tailwind
 └── package.json                  # Dependências e scripts do projeto
 ```
 
 ---
 
-## 🗺️ Roadmap Consolidado
-
-| Fase / Sprint | Duração | Entrega Principal | Status |
-| :--- | :--- | :--- | :--- |
-| **Semana 1** | 1 semana | **Setup & Core:** Setup React 19 + Vite, Dockerfile, integração API Sólides, tipagem TypeScript, listagem em cards e README.md. | ✅ **Concluído** |
-| **Semana 2** | 1 semana | **Filtros & UX:** Busca em tempo real por título, filtro por modalidade (Remoto/Híbrido/Presencial), badge "NOVA" (<48h) e paginação. | ✅ **Concluído** |
-| **Semana 3** | 1 semana | **Múltiplos Slugs & Favoritos:** Mapeamento de empresas residentes (Vsoft, Sólides, etc.), modal de detalhes em HTML e salvamento de favoritas via `localStorage`. | ✅ **Concluído** |
-| **Semana 4** | 1 semana | **Polimento & Portfólio:** Radar Tech Multiderivado (Sólides + LinkedIn Recife + GeekHunter/Remotar), Painel de Estatísticas, Skeleton Screens, modal "Sobre" e deploy de produção na Vercel. | ✅ **Concluído** |
-| **Semana 5** | 1 semana | **Qualidade & CI/CD:** Suíte de testes automatizados com Vitest (26 testes unitários/integração com Mocks), pipeline de CI/CD automática via GitHub Actions e resiliência de rede com limite de retries. | ✅ **Concluído** |
-| **Semana 6** | 1 semana | **Resiliência Offline & Modais:** Cache persistente com fallback automático (expiração 24h), `CacheBanner`, `EventoDetalhesModal` com procedência e suíte expandida para 37 testes automatizados. | ✅ **Concluído** |
-| **Semana 7** | 1 semana | **Motor de Analytics de Mercado:** Dashboard `MercadoInsights.tsx`, parser de 15+ stacks com regex estrito, cálculo de mediana salarial, snapshots diários (`Record<string, MercadoSnapshot>`) e suíte expandida para 44 testes automatizados. | ✅ **Concluído** |
-| **Semana 8** | 1 semana | **Relatório Público & Exportação de Inteligência:** Gerador de texto para LinkedIn (`relatorioFormatter.ts`), visão de impressão/PDF limpa (`RelatorioView.tsx` + `@media print`), cadastro de fontes tech verificadas (`fontesTech.ts`), suporte a deep links (`?aba=mercado`) e suíte expandida para 49 testes automatizados. | ✅ **Concluído** |
-| **Semana 9** | 1 semana | **Diário Técnico & Transparência de Engenharia:** Hub interativo de ADRs (`DiarioTecnicoModal.tsx`), telemetria viva (`ArquiteturaDiagrama.tsx`), artigo técnico externo em 1ª pessoa (`doc/diario-tecnico-artigo.md`), exportador de Markdown e suíte expandida para 62 testes automatizados. | ✅ **Concluído** |
-| **Semana 10** | 1 dia | **Sprint Final de Hardening & Fechamento:** Validação de schema runtime com Zod (`solidesSchema.ts`), transparência de curadoria manual de eventos, script `npm run test:coverage` (`@vitest/coverage-v8`), 66 testes automatizados e congelamento oficial do repositório. | ✅ **Concluído & Congelado** |
-
----
-
-## 🌐 Deploy de Produção na Vercel
-
-O Garimpo Dev está pronto para deploy contínuo na Vercel em 1 clique:
-
-1. Acesse [vercel.com](https://vercel.com) e faça login com a sua conta do GitHub.
-2. Clique em **"Add New"** → **"Project"**.
-3. Importe o repositório `jonasferreira-silva1/garimpo-dev`.
-4. O Vercel detectará automaticamente as configurações do Vite (`Framework Preset: Vite`).
-5. Clique em **Deploy**. Sua aplicação estará no ar em poucos segundos com a URL `https://garimpo-dev.vercel.app`!
-
-
----
-
 ## 🧪 Testes Automatizados e Qualidade de Código
 
-O projeto possui uma suíte completa de testes automatizados (unitários, integração e componentes com Vitest + Testing Library) e pipeline de CI/CD via GitHub Actions.
+O projeto possui uma suíte de **66 testes automatizados** (unitários, integração e componentes com Vitest + Testing Library) e pipeline de CI/CD configurada no GitHub Actions.
 
 ```bash
-# Executar a suíte de testes automatizados (Vitest)
+# Executar a suíte completa de testes automatizados (Vitest)
 npm run test
 
-# Executar a verificação de código com Oxlint
+# Gerar o relatório de cobertura de código (Vitest + V8 Coverage)
+npm run test:coverage
+
+# Executar a verificação estática de código com Oxlint
 npm run lint
 
-# Validar a compilação do TypeScript e bundle
+# Validar a compilação do TypeScript e gerar bundle de produção
 npm run build
 ```
 
