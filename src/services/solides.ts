@@ -7,6 +7,7 @@
 
 import axios from 'axios';
 import type { SolidesResponse, Vaga } from '../types/vaga';
+import { solidesResponseSchema } from '../schemas/solidesSchema';
 
 // Endpoint oficial de listagem de vagas da plataforma Sólides
 const SOLIDES_API_BASE_URL = 'https://apigw.solides.com.br/jobs/v3/home/vacancy';
@@ -19,7 +20,7 @@ export interface GetVagasParams {
 }
 
 /**
- * Busca a lista de vagas de um único slug da plataforma Sólides.
+ * Busca a lista de vagas de um único slug da plataforma Sólides com validação de schema Zod.
  * @param params Parâmetros de consulta (slug, página, quantidade e título)
  * @returns Promessa contendo a estrutura SolidesResponse com a lista de vagas e dados de paginação.
  */
@@ -39,7 +40,18 @@ export const fetchVagasSolides = async ({
       },
     });
 
-    return response.data;
+    // Validação de Schema em Runtime via Zod
+    const parseResult = solidesResponseSchema.safeParse(response.data);
+    if (!parseResult.success) {
+      console.warn(`[Zod Runtime Notice] Payload da API Sólides teve pequenas variações (slug: ${slug}):`, parseResult.error.issues);
+      // Se houver estrutura mínima utilizável, retorna casting defensivo; caso contrário lança erro
+      if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
+        return response.data;
+      }
+      throw new Error('Divergência de contrato de dados na API da Sólides.');
+    }
+
+    return parseResult.data as unknown as SolidesResponse;
   } catch (error) {
     console.error(`Erro ao conectar com a API da Sólides (slug: ${slug}):`, error);
     throw new Error('Não foi possível carregar as vagas. Verifique sua conexão.');

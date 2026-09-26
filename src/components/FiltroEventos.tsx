@@ -7,6 +7,7 @@
 import React from 'react';
 import { Search, SlidersHorizontal, Ticket } from 'lucide-react';
 import type { FiltrosEvento } from '../types/evento';
+import { DATA_ULTIMA_CURADORIA_EVENTOS } from '../data/eventos';
 
 interface FiltroEventosProps {
   filtros: FiltrosEvento;
@@ -90,8 +91,11 @@ export const FiltroEventos: React.FC<FiltroEventosProps> = ({
           ))}
         </div>
 
-        {/* Resumo de Eventos Exibidos */}
-        <div className="text-xs text-slate-400 shrink-0">
+        {/* Resumo de Eventos Exibidos & Badge de Curadoria */}
+        <div className="flex items-center gap-3 text-xs text-slate-400 shrink-0 flex-wrap">
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+            Curadoria: {DATA_ULTIMA_CURADORIA_EVENTOS.split('-').reverse().join('/')}
+          </span>
           <span>
             Exibindo <strong className="text-amber-400">{totalEventos}</strong> eventos cadastrados
           </span>

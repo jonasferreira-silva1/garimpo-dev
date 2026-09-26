@@ -6,6 +6,9 @@
 
 import type { Evento } from '../types/evento';
 
+// Metadado de Transparência: Data da última verificação manual de curadoria da lista de eventos
+export const DATA_ULTIMA_CURADORIA_EVENTOS = '2026-09-25';
+
 export const EVENTOS_TECH_RECIFE: Evento[] = [
   {
     id: 1,
