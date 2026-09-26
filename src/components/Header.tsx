@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Compass, Sparkles, MapPin, RefreshCw, Info, Briefcase, Calendar, ClipboardList, BarChart3 } from 'lucide-react';
+import { Compass, Sparkles, MapPin, RefreshCw, Info, Briefcase, Calendar, ClipboardList, BarChart3, BookOpen } from 'lucide-react';
 
 export type AbaNavegacao = 'vagas' | 'eventos' | 'candidaturas' | 'mercado';
 
@@ -17,6 +17,7 @@ interface HeaderProps {
   ultimaAtualizacao?: string;
   onRecarregar?: () => void;
   onOpenSobre?: () => void;
+  onOpenBastidores?: () => void;
   loading?: boolean;
 }
 
@@ -27,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   ultimaAtualizacao,
   onRecarregar,
   onOpenSobre,
+  onOpenBastidores,
   loading = false,
 }) => {
   return (
@@ -85,6 +87,17 @@ export const Header: React.FC<HeaderProps> = ({
                 className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors disabled:opacity-50 shrink-0"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-amber-400' : ''}`} />
+              </button>
+            )}
+
+            {onOpenBastidores && (
+              <button
+                onClick={onOpenBastidores}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 text-xs font-semibold border border-slate-700 transition-colors shrink-0"
+                title="Ver decisões de arquitetura (ADRs) e bastidores de engenharia"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                <span>Bastidores & ADRs</span>
               </button>
             )}
 

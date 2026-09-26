@@ -6,7 +6,7 @@
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-53_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-62_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -37,6 +37,7 @@ Entretanto, acompanhar as novas oportunidades de trabalho de forma centralizada 
 - 💵 **Tratamento Inteligente de Salários:** Formatação automática de faixas salariais em Real (R$) e rótulo "A combinar" para salários ocultos/negociáveis.
 - 📊 **Radar de Inteligência de Mercado Tech:** Dashboard `MercadoInsights.tsx` com análise estatística em tempo real de tecnologias mais demandadas (parser de 15+ stacks via regex estrito), cálculo de média e mediana salarial, distribuição por senioridade e histórico temporal salvo no navegador.
 - 📄 **Relatório Público & Exportação para LinkedIn/PDF:** Gerador de relatório institucional formatado em texto resiliente para LinkedIn, visão pronta para impressão/PDF (`@media print`) e modal interativo `RelatorioModal` com deep link via URL (`?aba=mercado`).
+- 📓 **Diário Técnico & Bastidores de Engenharia (ADRs):** Central interativa `DiarioTecnicoModal.tsx` com 6 Architecture Decision Records (ADRs), telemetria viva no cliente (`ArquiteturaDiagrama.tsx`) e artigo técnico em 1ª pessoa exportável em Markdown (`doc/diario-tecnico-artigo.md`) pronto para Dev.to/LinkedIn.
 - 🛡️ **Resiliência Offline & Fallback Cache (Stale-While-Revalidate):** Armazena automaticamente a resposta mais recente no `localStorage` com janela de validade de 24h. Em caso de instabilidade na API externa da Sólides, ativa o modo offline apresentando o banner informativo `CacheBanner` e permitindo reconexões limpas.
 - 🏛️ **Detalhes & Procedência Oficial de Eventos:** Modal dedicado `EventoDetalhesModal` com visualização de fontes verificadas (Sympla, Porto Digital, CESAR, PUG-PE) e mapa direto via Google Maps.
 - 📱 **Interface Responsiva & Glassmorphism:** Design limpo, acessível e otimizado para celulares, tablets e desktops.
@@ -192,17 +193,20 @@ docker start garimpo-app
 ```text
 garimpo-dev/
 ├── doc/
+│   ├── diario-tecnico-artigo.md  # Artigo técnico narrativo em 1ª pessoa (Dev.to / LinkedIn)
 │   └── garimpo-dev-docs.pdf      # Especificação completa do projeto
 ├── public/                       # Favicon e imagens estáticas
 ├── src/
 │   ├── components/               # Componentes de UI modulares
+│   │   ├── ArquiteturaDiagrama.tsx # Visualizador de arquitetura reativa & telemetria ao vivo
 │   │   ├── Badge.tsx             # Rótulos para vagas e modalidades
 │   │   ├── CandidaturasView.tsx  # Mini-Kanban do Tracker de Candidaturas
+│   │   ├── DiarioTecnicoModal.tsx# Modal interativo de ADRs e exportação do artigo
 │   │   ├── EmptyState.tsx        # Estado de lista vazia ou erro
 │   │   ├── EventoCard.tsx        # Card individual de evento tech
 │   │   ├── FiltroBar.tsx         # Barra de busca e filtros de vagas
 │   │   ├── FiltroEventos.tsx     # Barra de filtros para eventos tech
-│   │   ├── Header.tsx            # Cabeçalho com abas (Vagas, Eventos, Candidaturas, Mercado)
+│   │   ├── Header.tsx            # Cabeçalho com abas e botão "Bastidores & ADRs"
 │   │   ├── MercadoInsights.tsx   # Dashboard de inteligência e analytics de mercado
 │   │   ├── Paginacao.tsx         # Navegação por páginas
 │   │   ├── RadarOutrasFontes.tsx # Conectores tech (LinkedIn Recife, GeekHunter, Remotar)
@@ -215,6 +219,7 @@ garimpo-dev/
 │   │   ├── VagaDetalhesModal.tsx # Modal de descrição da vaga em HTML
 │   │   └── VagaSkeleton.tsx      # Skeleton screen animado (shimmer)
 │   ├── data/
+│   │   ├── diarioTecnico.ts      # Base de dados dos 6 ADRs do projeto e gerador do artigo
 │   │   ├── eventos.ts            # Base de dados curada de eventos tech em Recife
 │   │   └── fontesTech.ts         # Cadastro de fontes tech verificadas do ecossistema
 │   ├── hooks/
@@ -225,6 +230,7 @@ garimpo-dev/
 │   │   └── solides.ts            # Serviço de integração HTTP Axios
 │   ├── types/
 │   │   ├── candidatura.ts        # Interfaces e estilos do Tracker de Candidaturas
+│   │   ├── diario.ts             # Interfaces TypeScript para ADRs e Telemetria
 │   │   ├── evento.ts             # Interfaces TypeScript de Eventos Tech
 │   │   ├── mercado.ts            # Interfaces TypeScript de Analytics de Mercado
 │   │   └── vaga.ts               # Interfaces TypeScript da API Sólides
@@ -255,6 +261,7 @@ garimpo-dev/
 | **Semana 6** | 1 semana | **Resiliência Offline & Modais:** Cache persistente com fallback automático (expiração 24h), `CacheBanner`, `EventoDetalhesModal` com procedência e suíte expandida para 37 testes automatizados. | ✅ **Concluído** |
 | **Semana 7** | 1 semana | **Motor de Analytics de Mercado:** Dashboard `MercadoInsights.tsx`, parser de 15+ stacks com regex estrito, cálculo de mediana salarial, snapshots diários (`Record<string, MercadoSnapshot>`) e suíte expandida para 44 testes automatizados. | ✅ **Concluído** |
 | **Semana 8** | 1 semana | **Relatório Público & Exportação de Inteligência:** Gerador de texto para LinkedIn (`relatorioFormatter.ts`), visão de impressão/PDF limpa (`RelatorioView.tsx` + `@media print`), cadastro de fontes tech verificadas (`fontesTech.ts`), suporte a deep links (`?aba=mercado`) e suíte expandida para 49 testes automatizados. | ✅ **Concluído** |
+| **Semana 9** | 1 semana | **Diário Técnico & Transparência de Engenharia:** Hub interativo de ADRs (`DiarioTecnicoModal.tsx`), telemetria viva (`ArquiteturaDiagrama.tsx`), artigo técnico externo em 1ª pessoa (`doc/diario-tecnico-artigo.md`), exportador de Markdown e suíte expandida para 62 testes automatizados. | ✅ **Concluído** |
 
 ---
 

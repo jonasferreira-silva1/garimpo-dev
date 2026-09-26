@@ -26,6 +26,7 @@ import { EventoDetalhesModal } from './components/EventoDetalhesModal';
 import { FiltroEventos } from './components/FiltroEventos';
 import { CandidaturasView } from './components/CandidaturasView';
 import { MercadoInsights } from './components/MercadoInsights';
+import { DiarioTecnicoModal } from './components/DiarioTecnicoModal';
 import type { Evento, FiltrosEvento } from './types/evento';
 
 // Custom Hooks
@@ -83,6 +84,9 @@ const App: React.FC = () => {
 
   // Estado do Modal Sobre
   const [sobreOpen, setSobreOpen] = useState<boolean>(false);
+
+  // Estado do Modal de Diário Técnico / Bastidores & ADRs
+  const [bastidoresOpen, setBastidoresOpen] = useState<boolean>(false);
 
   // Estado dos Filtros da Seção de Eventos
   const [filtrosEvento, setFiltrosEvento] = useState<FiltrosEvento>({
@@ -146,6 +150,7 @@ const App: React.FC = () => {
         ultimaAtualizacao={ultimaAtualizacao}
         onRecarregar={recarregar}
         onOpenSobre={() => setSobreOpen(true)}
+        onOpenBastidores={() => setBastidoresOpen(true)}
         loading={loading}
       />
 
@@ -316,6 +321,13 @@ const App: React.FC = () => {
       <SobreModal
         isOpen={sobreOpen}
         onClose={() => setSobreOpen(false)}
+      />
+
+      {/* Modal de Diário Técnico / Bastidores & ADRs (Sprint 9) */}
+      <DiarioTecnicoModal
+        isOpen={bastidoresOpen}
+        onClose={() => setBastidoresOpen(false)}
+        vagasCount={vagas.length}
       />
 
       {/* Rodapé da Aplicação */}
