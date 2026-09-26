@@ -8,6 +8,7 @@
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Vitest](https://img.shields.io/badge/Vitest-66_Passed-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![Zod Schema](https://img.shields.io/badge/Zod-Runtime_Validated-3E67B1?style=flat-square&logo=zod)](https://zod.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Multi--stage-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 [![CI/CD Pipeline](https://github.com/jonasferreira-silva1/garimpo-dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasferreira-silva1/garimpo-dev/actions)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -33,7 +34,7 @@ O projeto foi construído utilizando metodologia de **Engenharia Pair-Programmin
 Em respeito à transparência de engenharia que norteia este projeto, destacamos as limitações pragmáticas da solução:
 
 1. **Dependência de Fonte Única:** O radar de vagas consome prioritariamente o API Gateway público da plataforma Sólides (empresas do Porto Digital e parceiras). O app não possui robôs de *web scraping* não autorizados em redes fechadas.
-2. **Curadoria Manual de Eventos:** O hub de eventos tech possui atualização periódica com data de verificação explicita na interface (`DATA_ULTIMA_CURADORIA_EVENTOS`), garantindo procedência sem exibir informações desatualizadas.
+2. **Curadoria Manual de Eventos:** O hub de eventos tech possui atualização periódica com data de verificação explícita na interface (`DATA_ULTIMA_CURADORIA_EVENTOS`), garantindo procedência sem exibir informações desatualizadas.
 3. **Arquitetura 100% Client-Side:** Para manter custo R$ 0,00 de infraestrutura, o Garimpo Dev não utiliza banco de dados próprio backend. As candidaturas e vagas favoritadas são persistidas localmente no `localStorage` do navegador do usuário.
 4. **Foco e Alcance Regional:** A ferramenta foi desenhada especificamente para o ecossistema de TI de Pernambuco (Recife e região metropolitana).
 
@@ -100,9 +101,60 @@ Em respeito à transparência de engenharia que norteia este projeto, destacamos
 | **Validation** | Zod | Validação de schema em runtime para respostas HTTP da API externa |
 | **Build Tool** | Vite 8 | Fast HMR, compilação ultrarrápida e bundle otimizado |
 | **Estilização** | Tailwind CSS v4 | Design system utilitário, temas escuros e alta performance |
+| **Container** | Docker + Nginx Alpine | Multi-stage build leve para ambiente de produção reprodutível |
 | **Testes & Coverage** | Vitest + Testing Library + V8 | Suíte de 66 testes automatizados com relatório de cobertura |
 | **Linter** | Oxlint | Linter em Rust ultrarrápido para garantia de código limpo |
 | **Deploy** | Vercel | Hospedagem de produção com deploy contínuo integrado ao GitHub |
+
+---
+
+## 🚀 Rodando Localmente & Docker Container 🐳
+
+### Pré-requisitos
+- **Node.js:** `v20.x` ou superior
+- **Docker Desktop:** `v24+` *(opcional, para execução via container)*
+
+### Execução com Node.js
+
+```bash
+# 1. Clonar o repositório
+git clone https://github.com/jonasferreira-silva1/garimpo-dev.git
+cd garimpo-dev
+
+# 2. Instalar as dependências
+npm install
+
+# 3. Executar o servidor de desenvolvimento
+npm run dev
+
+# 4. Acessar no navegador: http://localhost:5173
+```
+
+### Execução com Docker (Multi-stage Build + Nginx) 🐳
+
+```bash
+# 1. Construir a imagem Docker de produção
+docker build -t garimpo-dev .
+
+# 2. Executar o container na porta 8080
+docker run -d -p 8080:80 --name garimpo-app garimpo-dev
+
+# 3. Acessar no navegador: http://localhost:8080
+
+# 4. Para parar o container:
+docker stop garimpo-app
+```
+
+---
+
+## 🌐 Deploy em Produção na Vercel
+
+O Garimpo Dev está configurado para deploy contínuo automático na Vercel:
+
+1. Acesse [vercel.com](https://vercel.com) e faça login com a conta do GitHub.
+2. Importe o repositório `jonasferreira-silva1/garimpo-dev`.
+3. O Vercel detectará automaticamente as configurações do Vite (`Framework Preset: Vite`).
+4. Clique em **Deploy**. A aplicação estará disponível na URL oficial `https://garimpo-dev.vercel.app`!
 
 ---
 
@@ -161,7 +213,7 @@ garimpo-dev/
 │   ├── App.tsx                   # Aplicação React principal com rotas por aba
 │   ├── index.css                 # Estilos globais Tailwind v4
 │   └── main.tsx                  # Ponto de entrada React DOM
-├── Dockerfile                    # Multi-stage build (Node -> Nginx Alpine)
+├── Dockerfile                    # Multi-stage build (Node 20 Alpine -> Nginx Alpine)
 ├── vite.config.ts                # Configuração do Vite com Tailwind
 └── package.json                  # Dependências e scripts do projeto
 ```
