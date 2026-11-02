@@ -5,10 +5,11 @@
  * detalhes adicionais da oportunidade, salário, localização e botão de candidatura direta.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { X, Building2, MapPin, DollarSign, ExternalLink, Calendar, Star, CheckCircle2 } from 'lucide-react';
 import type { Vaga } from '../types/vaga';
 import { isNova, formatSalary, formatLocal, buildVagaUrl } from '../utils/formatters';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 import { Badge } from './Badge';
 
 interface VagaDetalhesModalProps {
@@ -38,6 +39,12 @@ export const VagaDetalhesModal: React.FC<VagaDetalhesModalProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [vaga, onClose]);
+
+  // Sanitização segura da descrição HTML da vaga (VULN-001)
+  const descricaoSanitizada = useMemo(
+    () => (vaga ? sanitizeHtml(vaga.description) : ''),
+    [vaga]
+  );
 
   if (!vaga) return null;
 
@@ -149,10 +156,10 @@ export const VagaDetalhesModal: React.FC<VagaDetalhesModalProps> = ({
           {/* Renderização da Descrição em HTML Sanitizado da Sólides */}
           <div>
             <h4 className="text-sm font-semibold text-slate-100 mb-3">Descrição Detalhada da Vaga</h4>
-            {vaga.description ? (
+            {descricaoSanitizada ? (
               <div
                 className="prose prose-invert max-w-none text-slate-300 space-y-3 prose-p:my-2 prose-ul:list-disc prose-ul:pl-4 prose-li:my-1 prose-strong:text-slate-100"
-                dangerouslySetInnerHTML={{ __html: vaga.description }}
+                dangerouslySetInnerHTML={{ __html: descricaoSanitizada }}
               />
             ) : (
               <p className="text-slate-400 italic">Nenhuma descrição detalhada informada pela empresa.</p>

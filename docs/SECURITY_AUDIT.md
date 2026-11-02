@@ -126,7 +126,7 @@ A auditoria inspecionou diretamente os arquivos e linhas do código-fonte onde s
 ### Grupo A: Vulnerabilidades de Segurança Exploráveis
 | ID | Título | Severidade Real (CVSS 3.1) | Vetor Oficial FIRST CVSS 3.1 | CWE | Localização | Status |
 |---|---|---|---|---|---|---|
-| **VULN-001** | Cross-Site Scripting (XSS) via Descrição HTML Não Sanitizada | **Média/Alta (6.1)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | CWE-79 | `src/components/VagaDetalhesModal.tsx:155` | Aberta |
+| **VULN-001** | Cross-Site Scripting (XSS) via Descrição HTML Não Sanitizada | **Média/Alta (6.1)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | CWE-79 | `src/components/VagaDetalhesModal.tsx:155` | **Corrigida (Sprint 1)** |
 | **VULN-002** | Open Redirect e Spoofing de Domínio em `buildVagaUrl` | **Média (5.4)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N` | CWE-601 | `src/utils/formatters.ts:82-85` | Aberta |
 
 ### Grupo B: Defesa em Profundidade & Hardening de Infra/CI/URLs
@@ -190,7 +190,8 @@ A auditoria inspecionou diretamente os arquivos e linhas do código-fonte onde s
     - *Atributos Permitidos:* SOMENTE `href`, `target`, `rel`. Proibição estrita de `class`, `style`, `id` e `data-*` (impedindo ataques de phishing e defacement visual via Tailwind CSS, como a injeção de classes `fixed inset-0 z-50 bg-white` que cobrem a tela com um falso formulário sem precisar de JavaScript).
     - *Hook Obrigatório:* Sanitizar tags `<a>` mantendo `href` apenas se iniciar por `https://` (ou `mailto:`), descartando o atributo em caso contrário; forçar `target="_blank"` e `rel="noopener noreferrer"`.
 - **Teste de Regressão:** Suíte Vitest com bateria de vetores maliciosos (`<script>`, `<img onerror>`, `<svg onload>`, `<a href="javascript:alert(1)">`, `<div class="fixed inset-0 ...">`, `<div style="...">`) garantindo que nenhum manipulador, estilo ou classe maliciosa sobreviva.
-- **Status:** Aberta (Agendada para Sprint 1)
+- **Status:** **Corrigida (Sprint 1 — Branch: `security/s1-001-xss-descricao-vaga`)**
+- **Implementação Realizada:** Criação do módulo [`src/utils/sanitizeHtml.ts`](file:///c:/DEV/garimpo-dev/src/utils/sanitizeHtml.ts) utilizando `dompurify@3.4.17` (versão estrita fixada), com allowlist estrita de tags estruturais e atributos SOMENTE `href`, `target`, `rel`. Proibição de atributos `class` (vetor de phishing Tailwind) e `style`. Hook `afterSanitizeAttributes` forçando esquema seguro (`https://` ou `mailto:`) e atributos `target="_blank"` e `rel="noopener noreferrer"`. Integração em `VagaDetalhesModal.tsx` com `useMemo`. Suíte de testes em `src/components/__tests__/VagaDetalhesModal.security.test.tsx` e `src/utils/__tests__/sanitizeHtml.test.ts`.
 
 ---
 
@@ -402,8 +403,8 @@ Sprint 7: Resiliência & UX (VULN-010, VULN-012, VULN-013) — AbortController, 
 Sprint 8: Auditoria Final & Fechamento — Validação de conformidade, métricas pós-hardening e documentação
 ```
 
-- **Sprint 1 (Prioridade Máxima — Vulnerabilidade Real):**  
-  Sanitização de HTML com `DOMPurify` em `VagaDetalhesModal.tsx` com allowlist estrita para descrições reais de vagas e bateria de testes de injeção em Vitest.
+- **Sprint 1 (Prioridade Máxima — Vulnerabilidade Real — Concluída ✅):**  
+  Sanitização estrita de HTML com `DOMPurify` em `VagaDetalhesModal.tsx` com allowlist estrita para descrições de vagas, hook defensivo de links externos e bateria completa de testes de injeção em Vitest.
 - **Sprint 2 (Estabilização da Base e Ferramental):**  
   Execução de `npm audit fix` (sem quebras), upgrade seguro do `zod` e `vite`, garantindo que testes futuros rodem sobre base limpa.
 - **Sprint 3 (Defesa em Profundidade HTTP):**  
