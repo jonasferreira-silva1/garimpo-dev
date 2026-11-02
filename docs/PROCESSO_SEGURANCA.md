@@ -1,45 +1,47 @@
 # 🛡️ Processo e Governança de Segurança de Aplicação (AppSec)
 **Projeto:** Garimpo Dev  
 **Responsável Técnico:** Antigravity Senior AppSec Engineer / Jonas Ferreira Silva  
-**Padrão de Referência:** OWASP Top 10 (2021), OWASP ASVS Nível 1, CWE Top 25  
-**Data de Criação:** Novembro de 2026  
+**Padrão de Referência:** OWASP Top 10 (2021), OWASP ASVS Nível 1, CWE Top 25, FIRST CVSS v3.1  
+**Data de Atualização:** Novembro de 2026 (Versão Calibrada pós-Revisão Técnica)  
 
 ---
 
 ## 1. Visão Geral e Filosofia de Segurança
 
-O **Garimpo Dev** adota o princípio de **Segurança por Design (Security by Design)** e **Defesa em Profundidade (Defense-in-Depth)**. Como uma aplicação 100% client-side (SPA) com arquitetura *zero-backend*, o modelo de segurança difere das aplicações web tradicionais:
+O **Garimpo Dev** adota o princípio de **Segurança por Design (Security by Design)** e **Defesa em Profundidade (Defense-in-Depth)**. Como uma aplicação 100% client-side (SPA) com arquitetura *zero-backend*, o modelo de segurança difere substancialmente das aplicações web corporativas tradicionais:
 
 1. **O Cliente é um Ambiente Hostil:**  
    Todo código executado no navegador pode ser inspecionado ou manipulado pelo usuário ou por extensões locais. Portanto, nenhuma regra de segurança depende de ofuscação.
 2. **Dados Externos são Sempre Não Confiáveis:**  
    Respostas do Gateway da Sólides, parâmetros de URL (`?aba=`) e até dados persistidos no `localStorage` são tratados como fontes não confiáveis que requerem sanitização e validação de schema rigorosa em runtime.
-3. **Custo Zero e Bundle Mínimo:**  
-   Nenhuma dependência pesada é adicionada sem justificativa técnica. Priorizamos recursos nativos da Web Platform e utilitários consolidados com impacto nulo na performance.
+3. **Calibragem Honesta de Risco:**  
+   Distinguimos com clareza **vulnerabilidades exploráveis** de **melhorias de robustez, resiliência e hardening**. Não inflamos métricas; classificamos cada achado com vetores calculados na especificação oficial do FIRST CVSS 3.1.
+4. **Custo Zero e Bundle Mínimo:**  
+   Nenhuma dependência pesada é adicionada sem justificativa técnica comprovada. Priorizamos recursos nativos da Web Platform e utilitários consolidados com impacto nulo na performance e no tempo de carregamento.
 
 ---
 
-## 2. Ciclo de Auditoria e Hardening em Sprints
+## 2. Ciclo Estratégico de Hardening em Sprints
 
-O processo de blindagem do Garimpo Dev foi estruturado em **9 etapas (Sprints 0 a 8)**:
+O cronograma de implementação foi ordenado de forma lógica, priorizando a vulnerabilidade de maior impacto real logo na largada e estabilizando dependências no início do ciclo para evitar retrabalho de testes:
 
 | Sprint | Foco Principal | Entregáveis Técnicos |
 |---|---|---|
-| **Sprint 0** | **Reconhecimento & Baseline** | Threat Model STRIDE, mapeamento de entradas/saídas, baseline de métricas (`npm audit`, lint, tests), relatório inicial `doc/SECURITY_AUDIT.md`. |
-| **Sprint 1** | **Injeção e XSS (Prioridade Máxima)** | Sanitização estrita com `DOMPurify` em `VagaDetalhesModal.tsx`, bloqueio de scripts/handlers/URIs maliciosas, testes de injeção de payloads. |
-| **Sprint 2** | **Integridade de Dados & Validação** | Validação com schemas Zod na leitura de `localStorage` (candidaturas, favoritos, cache), proteção contra poluição de protótipo, sanitização de `buildVagaUrl`. |
-| **Sprint 3** | **Links Externos, Navegação e Privacidade** | `rel="noopener noreferrer"` em todos os links externos, allowlist de domínios/protocolos `https:`, revisão de `@media print` e compartilhamento. |
-| **Sprint 4** | **Headers HTTP, CSP e Hardening de Servidor** | CSP estrito em `vercel.json` e `nginx.conf`, `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `server_tokens off`. |
-| **Sprint 5** | **Docker e Supply Chain** | Migração para `nginx-unprivileged:alpine` (não-root), fixação de imagens por digest SHA256, `.dockerignore` seguro, `npm audit` zerado. |
-| **Sprint 6** | **CI/CD, GitHub e Repositório** | Workflows com `permissions: contents: read`, actions fixadas por SHA, integração de CodeQL, Dependabot e verificação de segredos (Gitleaks). |
-| **Sprint 7** | **Resiliência, Abuso e Disponibilidade** | Polling com `AbortController` e timeout de 10s no Axios, prevenção de timers zumbis, `ErrorBoundary` global com tela de fallback limpa. |
-| **Sprint 8** | **Verificação Final e Documentação** | Re-execução completa de testes e audits, matriz de risco residual, documentação dos ADRs de segurança no `diarioTecnico.ts` e tag de release. |
+| **Sprint 0** | **Reconhecimento, STRIDE & Baseline Calibrado** | Threat Model STRIDE calibrado, negative testing (?aba=, inputs livres), análise de ReDoS, baseline de métricas (`npm audit`, lint, tests), relatório `docs/SECURITY_AUDIT.md`. |
+| **Sprint 1** | **Injeção e XSS (Prioridade Máxima — VULN-001)** | Sanitização estrita com `DOMPurify` em `VagaDetalhesModal.tsx` com allowlist para descrições reais, bloqueio de scripts/handlers e bateria de testes de injeção em Vitest. |
+| **Sprint 2** | **Supply Chain & Estabilização de Base (VULN-008)** | Resolução de dependências via `npm audit fix` (sem quebras), upgrade de segurança do `zod` e `vite`, garantindo base estável para as sprints seguintes. |
+| **Sprint 3** | **Defesa em Profundidade & Headers HTTP (VULN-006)** | Configuração de CSP inicial em modo `Content-Security-Policy-Report-Only` no `vercel.json` e `nginx.conf`, `frame-ancestors 'none'`, e auditoria de HSTS. |
+| **Sprint 4** | **Sanitização de URLs e Contrato de APIs (VULN-002, 004, 011)** | `buildVagaUrl` estrito por regex sem fallback cego para `portodigital`, validação Zod no agregador `fetchVagasMultiplosSlugs` e filtro de protocolos em links externos. |
+| **Sprint 5** | **Integridade e Robustez de Dados Locais (VULN-003, 005)** | Schemas Zod na leitura de `localStorage` para candidaturas e favoritos com fallback resiliente, e registro formal da mitigação de Prototype Pollution. |
+| **Sprint 6** | **Infraestrutura Docker & CI/CD (VULN-007, 009)** | Migração para `nginxinc/nginx-unprivileged:alpine` com escuta na porta **8080**, instruções atualizadas no README e restrição de permissões (`contents: read`) no GitHub Actions com pinning SHA. |
+| **Sprint 7** | **Resiliência, Abuso e UX (VULN-010, 012, 013)** | Polling periódico com `AbortController` e timeout de 10s no Axios, componente `GlobalErrorBoundary` contra tela branca e remoção de logs de console em produção. |
+| **Sprint 8** | **Verificação Final, Matriz de Risco e Conclusão** | Re-execução completa de testes de regressão de segurança, verificação no SecurityHeaders, matriz de risco residual e documentação dos ADRs no `diarioTecnico.ts`. |
 
 ---
 
 ## 3. Regras de Trabalho e Rastreabilidade Git
 
-Para garantir total auditabilidade e conformidade com os mais altos padrões de engenharia:
+Para garantir total auditabilidade e conformidade com padrões de engenharia de software de alta maturidade:
 
 ### 3.1 Padrão de Branches e Commits
 - Cada vulnerabilidade ou grupo atômico de correções é desenvolvido em branch dedicada:  
@@ -50,24 +52,27 @@ Para garantir total auditabilidade e conformidade com os mais altos padrões de 
   ```bash
   npm run lint && npm run test && npm run build
   ```
-- Nenhum commit é realizado sem o devido registro no relatório `doc/SECURITY_AUDIT.md`.
+- Nenhum commit é realizado sem o devido registro no relatório `docs/SECURITY_AUDIT.md`.
 
 ---
 
-## 4. Matriz de Classificação de Vulnerabilidades (CVSS 3.1)
+## 4. Matriz de Classificação de Achados (FIRST CVSS 3.1)
 
-Todas as vulnerabilidades encontradas são catalogadas com a seguinte estrutura padronizada:
+Todas as questões identificadas são catalogadas sob quatro grupos padronizados:
+- **Grupo A: Vulnerabilidades de Segurança Exploráveis:** Falhas que permitem a um atacante externo interferir diretamente no usuário (`VULN-001`, `VULN-002`, `VULN-011`).
+- **Grupo B: Defesa em Profundidade & Hardening de Infra/CI:** Configurações defensivas que reduzem a superfície de ataque e o raio de explosão (`VULN-006`, `VULN-007`, `VULN-009`).
+- **Grupo C: Robustez de Software & Integridade de Dados:** Validações de runtime que protegem a aplicação contra estados inconsistentes (`VULN-003`, `VULN-004`, `VULN-005`).
+- **Grupo D: Resiliência, UX e Higiene Operacional:** Prevenção de desperdício de recursos, falhas de interface e logs ruidosos (`VULN-008`, `VULN-010`, `VULN-012`, `VULN-013`).
+
+### 4.1 Estrutura de Documentação por Achado
 - **ID:** Código rastreável único (`VULN-001` a `VULN-013`).
-- **Título & Severidade:** Pontuação métrica pelo Common Vulnerability Scoring System (CVSS v3.1) e classificação qualitativa:
-  - **Crítica:** 9.0 – 10.0
-  - **Alta:** 7.0 – 8.9
-  - **Média:** 4.0 – 6.9
-  - **Baixa:** 0.1 – 3.9
-- **Local:** Caminho do arquivo e número de linha exato (`arquivo:linha`).
-- **Prova de Conceito (PoC):** Procedimento reproduzível estritamente em ambiente local.
-- **Impacto:** Consequência técnica e de negócio da exploração.
-- **Correção Proposta:** Abordagem de engenharia para mitigar a causa raiz.
-- **Teste de Regressão:** Teste automatizado que falha com a falha presente e passa após a correção.
+- **Título & Classificação:** Rótulo honesto do tipo de achado (Vulnerabilidade, Hardening, Robustez ou Resiliência).
+- **Vetor & Pontuação CVSS v3.1:** Cálculo na calculadora oficial do FIRST (`first.org/cvss/calculator/3.1`).
+- **Local:** Caminho do arquivo e intervalo de linhas exato (`arquivo:linha`).
+- **Vetor Real vs Simulação Local (PoC):** Cenário de ameaça real e passos reproduzíveis em ambiente local.
+- **Impacto Real:** Avaliação honesta do dano técnico e funcional.
+- **Correção Proposta:** Abordagem de engenharia para mitigar a causa raiz sem quebrar a experiência de uso.
+- **Teste de Regressão:** Teste automatizado que falha com o código vulnerável e passa com a correção aplicada.
 - **Status:** Ciclo de vida (`Aberta` → `Em Progresso` → `Corrigida` → `Validada`).
 
 ---
