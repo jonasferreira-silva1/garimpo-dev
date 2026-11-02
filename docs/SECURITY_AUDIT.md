@@ -24,10 +24,10 @@ Diferente de aplicações corporativas com servidores próprios, a arquitetura *
 
 ### 1.2 Calibragem Metodológica dos Apontamentos
 Para evitar inflar métricas de segurança e manter a transparência exigida por padrões de engenharia sênior (OWASP ASVS e CVSS 3.1 oficial do FIRST), esta auditoria separa formalmente os **13 apontamentos identificados** em quatro categorias claras:
-- **Vulnerabilidades de Segurança Reais / Exploráveis (3 achados):** Falhas em que um agente externo malicioso pode induzir a execução de scripts ou desviar o tráfego do usuário (`VULN-001`, `VULN-002`, `VULN-011`).
-- **Defesa em Profundidade & Hardening de Infra/CI (3 achados):** Controles defensivos ausentes que mitigam o raio de explosão de ataques secundários (`VULN-006`, `VULN-007`, `VULN-009`).
+- **Vulnerabilidades de Segurança Reais / Exploráveis (2 achados):** Falhas em que um agente externo malicioso pode induzir a execução de scripts ou desviar o tráfego do usuário (`VULN-001`, `VULN-002`).
+- **Defesa em Profundidade & Hardening de Infra/CI/URLs (4 achados):** Controles defensivos ausentes que mitigam o raio de explosão de ataques secundários e bloqueiam esquemas inseguros de URL (`VULN-006`, `VULN-007`, `VULN-009`, `VULN-011`).
 - **Robustez de Software & Integridade de Dados (3 achados):** Validação de tipos em runtime e tratamento contra dados malformados de APIs ou storage local (`VULN-003`, `VULN-004`, `VULN-005` — este último reclassificado como falso positivo mitigado por design).
-- **Resiliência de Interface & Higiene Operacional (4 achados):** Prevenção de degradação de performance, controle de ciclo de vida de timers e limpeza de logs (`VULN-010`, `VULN-012`, `VULN-013`, e o escopo de supply chain em `VULN-008`).
+- **Resiliência de Interface & Higiene Operacional (4 achados):** Prevenção de degradação de performance, controle de ciclo de vida de timers, mitigação de vulnerabilidades em dependências e limpeza de logs (`VULN-008`, `VULN-010`, `VULN-012`, `VULN-013`).
 
 ---
 
@@ -59,21 +59,21 @@ A modelagem de ameaças adotou a metodologia **STRIDE** (Spoofing, Tampering, Re
 
 | Ameaça (STRIDE) | Componente Afetado | Vetor / Cenário Real de Ataque | Categoria | Severidade Real | Mitigação no Garimpo Dev |
 |---|---|---|---|---|---|
-| **Elevation of Privilege** (Injeção / XSS) | `VagaDetalhesModal.tsx` (`dangerouslySetInnerHTML`) | Empresa maliciosa publica vaga com descrição HTML adulterada na plataforma Sólides (ou falha de sanitização no gateway). Ao abrir o modal, scripts injetados executam na origem da vítima. | Vulnerabilidade | **Média/Alta (CVSS 6.1 a 7.1)** | Sanitização estrita com `DOMPurify` aceitando tags estruturais reais (`h1-h6`, `p`, `b`, `i`, `ul`, `ol`, `li`, `br`, `div`, `span`, `a` com protocolo `https:` e forçando `rel="noopener noreferrer"`). |
+| **Elevation of Privilege** (Injeção / XSS) | `VagaDetalhesModal.tsx` (`dangerouslySetInnerHTML`) | Empresa maliciosa publica vaga com descrição HTML adulterada na plataforma Sólides (ou falha de sanitização no gateway). Ao abrir o modal, scripts injetados executam na origem da vítima. | Vulnerabilidade | **Média/Alta (CVSS 6.1 a 7.1)** | Sanitização estrita com `DOMPurify` aceitando tags estruturais reais (`h1-h6`, `p`, `b`, `i`, `strong`, `em`, `ul`, `ol`, `li`, `br`, `div`, `span`, `blockquote`, `code`, `pre`, `a`). Atributos permitidos SOMENTE `href`, `target`, `rel`. Proibição explícita de `class` (evitando phishing via Tailwind com `fixed inset-0 z-50 bg-white`) e `style`. |
 | **Spoofing** (Falsificação de Destino) | `buildVagaUrl` em `formatters.ts` | Campo `slug` contendo caracteres de fragmento (`#`) ou autenticação em URL (`@`) desviando o host `.vagas.solides.com.br` para portal de phishing externo. | Vulnerabilidade | **Média (CVSS 5.4)** | Validação estrita de `slug` por regex (`/^[a-zA-Z0-9_-]+$/`) e `id` inteiro positivo (> 0). Caso inválido, não renderizar o link (evitando fallback que envie para vaga arbitrária). |
-| **Information Disclosure** (Privacidade / Spoofing) | `VagaDetalhesModal.tsx` (`<img src>`) e Links Externos | URLs de logos de terceiros ou links com protocolos arbitrários (`javascript:`, `data:`). | Vulnerabilidade / Privacidade | **Baixa (CVSS 3.5)** | Validação de protocolo em `<a>` (`https:`, `mailto:`, `tel:`), `referrerpolicy="no-referrer"` em imagens e `Referrer-Policy: strict-origin-when-cross-origin`. |
-| **Tampering** (Adulteração de Estado) | `localStorage` (cache, candidaturas, favoritos, histórico) | Manipulação direta do storage por extensões do navegador ou XSS local injetando tipos incompatíveis. | Robustez de Dados | **Baixa (CVSS 3.9)** | Schemas Zod em runtime na leitura do `localStorage` com recuperação graciosa e descarte defensivo. |
-| **Denial of Service** (Esgotamento de Recursos) | `useVagas` (Polling de 5min) | Requisições concorrentes acumuladas em conexões instáveis sem cancelamento. | Resiliência | **Informativa (CVSS 3.7)** | Integração de `AbortController` com timeout de 10s no Axios e cancelamento ativo no cleanup do `useEffect`. |
-| **Information Disclosure** (Vazamento Operacional) | Logs de console em `solides.ts` | `console.error` expondo stack traces de requisições de rede. | Higiene | **Informativa (CVSS 2.4)** | Supressão de logs em produção (`if (import.meta.env.DEV)`). |
+| **Information Disclosure / Hardening** (Esquema de URL) | Links Externos e `VagaDetalhesModal.tsx` | URLs com protocolos arbitrários (`javascript:`, `data:`). Grep confirma que nenhum `<a href>` recebe URLs dinâmicas cruas da API (links de vaga usam `buildVagaUrl` e eventos são estáticos). | Hardening / Defesa em Profundidade | **Média (CVSS 4.3)** | Validação defensiva de protocolo em `<a>` (apenas `https:` e `mailto:`), `referrerpolicy="no-referrer"` em imagens e cabeçalhos de segurança. |
+| **Tampering** (Adulteração de Estado) | `localStorage` (cache, candidaturas, favoritos, histórico) | Manipulação direta do storage por extensões do navegador ou XSS local injetando tipos incompatíveis. | Robustez de Dados | **Média (CVSS 4.4)** | Schemas Zod em runtime na leitura do `localStorage` com recuperação graciosa e descarte defensivo. |
+| **Denial of Service** (Esgotamento de Recursos) | `useVagas` (Polling de 5min) | Requisições concorrentes acumuladas em conexões instáveis sem cancelamento. | Resiliência | **Informativa / Baixa (CVSS 2.9)** | Integração de `AbortController` com timeout de 10s no Axios e cancelamento ativo no cleanup do `useEffect`. |
+| **Information Disclosure** (Vazamento Operacional) | Logs de console em `solides.ts` | `console.error` expondo stack traces de requisições de rede. | Higiene | **Baixa (CVSS 4.0)** | Supressão de logs em produção (`if (import.meta.env.DEV)`). |
 
 ### 2.2 Controles Verificados e Seguros (Negative Security Testing)
-A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnerabilidade foi detectada**, confirmando as salvaguardas nativas da arquitetura:
-1. **Parâmetro de Navegação `?aba=` (`App.tsx`):**
-   - *Verificação:* O valor recebido via `URLSearchParams` é confrontado contra uma allowlist estrita de identificadores de aba válidos (`'vagas' | 'candidaturas' | 'favoritos' | 'mercado' | 'radar' | 'eventos'`). Qualquer entrada desconhecida faz fallback seguro para a aba inicial `'vagas'`. Sem injeção dinâmica de componentes nem avaliação insegura (`eval`).
+A auditoria inspecionou diretamente os arquivos e linhas do código-fonte onde salvaguardas nativas da arquitetura estão ativas:
+1. **Parâmetro de Navegação `?aba=` ([`src/App.tsx:41-50`](file:///c:/DEV/garimpo-dev/src/App.tsx#L41-L50)):**
+   - *Verificação no Código:* O valor lido de `URLSearchParams` é testado explicitamente contra a allowlist `'mercado' | 'eventos' | 'candidaturas' | 'vagas'` (linha 45). Se o parâmetro for nulo, inválido ou adulterado, o fallback seguro para a aba padrão `'vagas'` é retornado na linha 49. Sem injeção dinâmica de componentes nem avaliação insegura (`eval`).
 2. **Inputs Livres do Usuário (Busca, Filtros e Anotações de Candidatura):**
-   - *Verificação:* O texto de busca (`filtros.busca`) e as notas livres em `StatusSelector.tsx` (`tempObs`) são renderizados no DOM exclusivamente através de expressões JSX (`{texto}`), acionando o escaping nativo de entidades HTML do React 19 contra injeção de tags.
-3. **Avaliação Empírica de ReDoS em `mercadoAnalytics.ts` (`DEFINICOES_STACKS`):**
-   - *Verificação:* As 15 expressões regulares utilizadas para extração de tecnologias foram testadas com entradas patológicas (50.000 repetições de caracteres com quebra de limites). O tempo médio de avaliação foi de **1.09 ms**, confirmando complexidade linear $O(N)$ e ausência de backtracking catastrófico (sem quantificadores aninhados do tipo `(a+)+`).
+   - *Verificação no Código:* O campo de busca em [`src/components/FiltroBar.tsx:51-57`](file:///c:/DEV/garimpo-dev/src/components/FiltroBar.tsx#L51-L57) opera como input controlado via React (`value={filtros.busca}`). As anotações livres em [`src/components/StatusSelector.tsx:28, 86, 114`](file:///c:/DEV/garimpo-dev/src/components/StatusSelector.tsx#L28) e [`src/components/CandidaturasView.tsx:142`](file:///c:/DEV/garimpo-dev/src/components/CandidaturasView.tsx#L142) são inseridas no DOM estritamente como nós de texto em interpolações JSX (`{candidatura.observacoes}` / `{item.observacoes}`), acionando o escaping nativo de entidades HTML do React 19 contra injeção de tags.
+3. **Inspeção de ReDoS em [`src/utils/mercadoAnalytics.ts:20-36`](file:///c:/DEV/garimpo-dev/src/utils/mercadoAnalytics.ts#L20-L36) (`DEFINICOES_STACKS`):**
+   - *Verificação no Código:* Todas as 15 expressões regulares foram inspecionadas no arquivo-fonte. Nenhum quantificador aninhado foi encontrado na inspeção estática (ausência de construções como `(a+)+` ou repetições sobrepostas suscetíveis a backtracking catastrófico). O único quantificador repetitivo presente é `\s*` em `\bio\s*s\b` (linha 34), o qual opera delimitado por fronteiras de palavra (`\b`) com complexidade estritamente linear.
 
 ---
 
@@ -128,29 +128,29 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 |---|---|---|---|---|---|---|
 | **VULN-001** | Cross-Site Scripting (XSS) via Descrição HTML Não Sanitizada | **Média/Alta (6.1)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | CWE-79 | `src/components/VagaDetalhesModal.tsx:155` | Aberta |
 | **VULN-002** | Open Redirect e Spoofing de Domínio em `buildVagaUrl` | **Média (5.4)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N` | CWE-601 | `src/utils/formatters.ts:82-85` | Aberta |
-| **VULN-011** | Ausência de Validação de Protocolo em URLs Externas (`javascript:`) | **Baixa (3.5)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N` | CWE-20, CWE-79 | `src/components/VagaDetalhesModal.tsx:69`, `EventoCard.tsx:123` | Aberta |
 
-### Grupo B: Defesa em Profundidade & Hardening de Infra/CI
+### Grupo B: Defesa em Profundidade & Hardening de Infra/CI/URLs
 | ID | Título | Severidade Real (CVSS 3.1) | Vetor Oficial FIRST CVSS 3.1 | CWE | Localização | Status |
 |---|---|---|---|---|---|---|
 | **VULN-006** | Ausência de CSP e Cabeçalhos de Segurança HTTP (Vercel & Nginx) | **Média (4.2)** | `CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | CWE-1021, CWE-693 | `Dockerfile`, ausência de `nginx.conf` e `vercel.json` | Aberta |
 | **VULN-007** | Execução de Container Docker como Root (Porta 80 vs 8080) | **Média (4.5)** | `CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L` | CWE-250 | `Dockerfile:4,23`, `.dockerignore` | Aberta |
 | **VULN-009** | Workflow de CI com Permissões Excessivas e Actions Sem SHA Pinning | **Média (4.2)** | `CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N` | CWE-829 | `.github/workflows/ci.yml:1-35` | Aberta |
+| **VULN-011** | Ausência de Validação de Protocolo em URLs Externas (`javascript:`) | **Média (4.3)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N` | CWE-20, CWE-79 | `src/components/VagaDetalhesModal.tsx:182`, `EventoCard.tsx:123` | Aberta |
 
 ### Grupo C: Robustez de Software & Integridade de Dados
 | ID | Título | Severidade Real (CVSS 3.1) | Vetor Oficial FIRST CVSS 3.1 | CWE | Localização | Status |
 |---|---|---|---|---|---|---|
-| **VULN-003** | Ausência de Schema Zod na Deserialização de `localStorage` | **Baixa (3.9)** | `CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L` | CWE-20, CWE-1284 | `useCandidaturas.ts:18`, `useFavoritos.ts:17`, `useVagas.ts:55` | Aberta |
+| **VULN-003** | Ausência de Schema Zod na Deserialização de `localStorage` | **Média (4.4)** | `CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L` | CWE-20, CWE-1284 | `useCandidaturas.ts:18`, `useFavoritos.ts:17`, `useVagas.ts:55` | Aberta |
 | **VULN-004** | Bypass de Validação Zod em Modo Agregado (`fetchVagasMultiplosSlugs`) | **Baixa (3.7)** | `CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` | CWE-20 | `src/services/solides.ts:48-50,91-98` | Aberta |
 | **VULN-005** | Avaliação de Risco de Poluição de Protótipo em Histórico de Mercado | **Informativa (0.0)** | `N/A (Falso Positivo Mitigado por Design)` | CWE-1321 | `src/utils/mercadoAnalytics.ts:217` | Mitigada |
 
 ### Grupo D: Resiliência, UX e Higiene Operacional
 | ID | Título | Severidade Real (CVSS 3.1) | Vetor Oficial FIRST CVSS 3.1 | CWE | Localização | Status |
 |---|---|---|---|---|---|---|
-| **VULN-008** | Dependências com Vulnerabilidades em Dev/Runtime (npm audit) | **Média (5.3 a 7.5)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` *(Runtime Zod)* | CWE-1395 | `package.json`, `package-lock.json` | Aberta |
-| **VULN-010** | Polling de 5min sem AbortController e Acúmulo de Requisições | **Informativa (3.7)** | `CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` | CWE-400 | `src/hooks/useVagas.ts:87-151,161-174` | Aberta |
+| **VULN-008** | Dependências com Vulnerabilidades em Dev/Runtime (npm audit) | **Alta (7.5)** | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` *(Runtime Zod)* | CWE-1395 | `package.json`, `package-lock.json` | Aberta |
+| **VULN-010** | Polling de 5min sem AbortController e Acúmulo de Requisições | **Informativa / Baixa (2.9)** | `CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` | CWE-400 | `src/hooks/useVagas.ts:87-151,161-174` | Aberta |
 | **VULN-012** | Ausência de Error Boundary Global (Tela Branca / Degradation) | **Informativa (2.9)** | `CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` | CWE-209 | `src/main.tsx:1-13` | Aberta |
-| **VULN-013** | Exposição de Objetos de Erro de Rede em Logs de Console | **Informativa (2.4)** | `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` | CWE-532 | `src/services/solides.ts:46,56,120` | Aberta |
+| **VULN-013** | Exposição de Objetos de Erro de Rede em Logs de Console | **Baixa (4.0)** | `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` | CWE-532 | `src/services/solides.ts:46,56,120` | Aberta |
 
 ---
 
@@ -187,9 +187,9 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
   - Instalar `dompurify` (e `@types/dompurify`).
   - Configurar allowlist abrangente e realista que suporte as formatações legítimas de vagas:
     - *Tags Permitidas:* `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p`, `b`, `i`, `strong`, `em`, `ul`, `ol`, `li`, `br`, `div`, `span`, `blockquote`, `code`, `pre`, `a`.
-    - *Atributos Permitidos:* `class` (formatado), `href`, `target`, `rel`.
-    - *Hook Obrigatório:* Sanitizar tags `<a>` forçando protocolo `https:` e atribuindo `rel="noopener noreferrer"` e `target="_blank"`.
-- **Teste de Regressão:** Suíte Vitest com bateria de vetores maliciosos (`<script>`, `<img onerror>`, `<svg onload>`, `<a href="javascript:alert(1)">`) garantindo que nenhum manipulador ou script sobreviva.
+    - *Atributos Permitidos:* SOMENTE `href`, `target`, `rel`. Proibição estrita de `class`, `style`, `id` e `data-*` (impedindo ataques de phishing e defacement visual via Tailwind CSS, como a injeção de classes `fixed inset-0 z-50 bg-white` que cobrem a tela com um falso formulário sem precisar de JavaScript).
+    - *Hook Obrigatório:* Sanitizar tags `<a>` mantendo `href` apenas se iniciar por `https://` (ou `mailto:`), descartando o atributo em caso contrário; forçar `target="_blank"` e `rel="noopener noreferrer"`.
+- **Teste de Regressão:** Suíte Vitest com bateria de vetores maliciosos (`<script>`, `<img onerror>`, `<svg onload>`, `<a href="javascript:alert(1)">`, `<div class="fixed inset-0 ...">`, `<div style="...">`) garantindo que nenhum manipulador, estilo ou classe maliciosa sobreviva.
 - **Status:** Aberta (Agendada para Sprint 1)
 
 ---
@@ -221,7 +221,7 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 
 ### VULN-003: Ausência de Schema Zod na Deserialização de `localStorage`
 - **Classificação:** Robustez de Software & Integridade de Dados (Não é RCE)
-- **Severidade Calibrada:** Baixa — `CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L` (Score: **3.9**)
+- **Severidade Calibrada:** Média — `CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L` (Score: **4.4**)
 - **CWE / OWASP:** CWE-20, CWE-1284 (Improper Input Validation) / OWASP A08:2021
 - **Local:** [`src/hooks/useCandidaturas.ts:18`](file:///c:/DEV/garimpo-dev/src/hooks/useCandidaturas.ts#L18), [`src/hooks/useFavoritos.ts:17`](file:///c:/DEV/garimpo-dev/src/hooks/useFavoritos.ts#L17), [`src/hooks/useVagas.ts:55`](file:///c:/DEV/garimpo-dev/src/hooks/useVagas.ts#L55)
 - **Análise Técnica sobre Desserialização:**  
@@ -256,12 +256,12 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 - **CWE / OWASP:** CWE-1321 (Prototype Pollution)
 - **Local:** [`src/utils/mercadoAnalytics.ts:217`](file:///c:/DEV/garimpo-dev/src/utils/mercadoAnalytics.ts#L217)
 - **Análise Técnica Detalhada:**  
-  A linha 217 executa `mapa[snapshot.data] = snapshot`. Uma análise preliminar suspeitou de Prototype Pollution. No entanto, no ecossistema JavaScript moderno:
-  1. `JSON.parse` cria propriedades próprias e não altera o `Object.prototype` mesmo que a string contenha `"__proto__"`;
-  2. `snapshot.data` é gerado internamente pela função pura `gerarSnapshotMercado` através de `new Date().toISOString().split('T')[0]` (ex: `"2026-11-02"`), não sendo um input aberto controlado por atacantes;
-  3. Não há operações de merge recursivo profundo (`deepmerge`) nem atribuições em cadeia.
-  Portanto, **não há vulnerabilidade explorável ativa**.
-- **Ação Recomendada (Higiene):** Manter uma trava defensiva simples verificando se a chave de data não pertence a palavras reservadas (`__proto__`, `constructor`, `prototype`) antes da atribuição.
+  A linha 217 de `src/utils/mercadoAnalytics.ts` executa `mapa[snapshot.data] = snapshot`. Uma análise preliminar levantou suspeita de Prototype Pollution. No entanto, avaliando o fluxo real de execução:
+  1. O histórico é lido de `localStorage.getItem(HISTORICO_CACHE_KEY)` (linha 209-213) e desserializado com `JSON.parse`. Como o storage local é controlável pelo usuário no navegador via DevTools, a entrada não é inviolável;
+  2. Contudo, em JavaScript moderno, a atribuição `mapa['__proto__'] = snapshot` em um objeto literal comum (`mapa = {}`) apenas sobrescreve o protótipo daquela instância específica ou cria uma propriedade própria, **não poluindo o `Object.prototype` global** do runtime;
+  3. Não ocorrem operações de mesclagem recursiva profunda (`deepmerge`) nem cópias de chaves sem sanitização.
+  Portanto, **não há poluição global de protótipo ativa**.
+- **Ação Recomendada (Higiene Defensiva):** Utilizar `Map` tipado ou objeto sem protótipo (`Object.create(null)`), ou validar previamente se `snapshot.data` não coincide com propriedades reservadas (`__proto__`, `constructor`, `prototype`) antes da atribuição.
 - **Status:** Mitigada / Falso Positivo Documentado (Sprint 5)
 
 ---
@@ -301,20 +301,20 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 
 ### VULN-008: Dependências com Vulnerabilidades em Dev/Runtime (npm audit)
 - **Classificação:** Supply Chain & Higiene de Dependências
-- **Severidade Calibrada:** Média/Alta (dependendo do escopo de execução)
+- **Severidade Calibrada:** Alta (Runtime Zod) — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` (Score: **7.5**, advisory `GHSA-mrhx-c7xc-m3w5`)
 - **CWE / OWASP:** CWE-1395 / OWASP A06:2021
 - **Local:** [`package.json`](file:///c:/DEV/garimpo-dev/package.json), [`package-lock.json`](file:///c:/DEV/garimpo-dev/package-lock.json)
 - **Classificação por Escopo Real de Execução:**  
-  O comando `npm audit` reporta 8 advisories. É fundamental categorizar quais componentes de fato atingem o usuário final:
-  1. **Dependência de Produção / Runtime no Navegador:**
-     - `zod` (<4.6.6): Advisory `GHSA-mrhx-c7xc-m3w5` (exaustão de memória com schemas superdimensionados). Afeta a validação no cliente. Atualizável para `>=4.6.7`.
-  2. **Dependência Transitiva de Node (Não Bundled no Navegador):**
-     - `follow-redirects` (advisories `GHSA-q3jh-wrc6-jgq8`, `GHSA-8r9p-f939-6h3c`): Dependência de Node.js trazida pelo Axios. Em compilação Vite para browser, o Axios utiliza o adapter nativo `fetch`/`XMLHttpRequest`, eliminando o runtime do `follow-redirects` no bundle final.
-  3. **Ferramentas de Desenvolvimento, Teste e Build (Dev/Local/CI):**
-     - `vite` (dev server no Windows, middleware bypass: `GHSA-698v-4r3x-3vcv`, `GHSA-587h-7wmj-h5pm`);
-     - `@vitest/mocker` / `vitest` (`GHSA-qxg6-89mg-rqv8`, `GHSA-xp26-3454-mjgp`);
-     - `undici` (`GHSA-4qv8-2p9j-2685`, dependência transitiva do ambiente JSDOM);
-     - `source-map-js` (`GHSA-68fv-2mgg-jv7q`, dependência de build de CSS).
+  O comando `npm audit` reporta 8 advisories. É fundamental segregar com rigor técnico o escopo que atinge o cliente final daquele restrito a ferramentas de desenvolvimento/CI:
+  1. **Dependência de Produção / Runtime no Navegador (Score 7.5):**
+     - `zod` (<4.6.6): Advisory `GHSA-mrhx-c7xc-m3w5` (`CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` — Score **7.5**). Exaustão de memória ao validar coleções não limitadas. Afeta o runtime client-side. Corrigível com upgrade para `>=4.6.7` via `npm audit fix`.
+  2. **Dependência Transitiva de Node.js (Não Empacotada no Navegador):**
+     - `follow-redirects` (`GHSA-q3jh-wrc6-jgq8`, `GHSA-8r9p-f939-6h3c`): Dependência de Node.js do Axios. Em compilações Vite para browser, o Axios utiliza adapters nativos do navegador (`fetch`/`XMLHttpRequest`), não inserindo `follow-redirects` no bundle final.
+  3. **Ferramentas de Desenvolvimento, Teste e Build (Escopo Dev/CI — Não Presentes em Produção):**
+     - `vite` (`GHSA-698v-4r3x-3vcv`, `GHSA-587h-7wmj-h5pm`): Dev server local no Windows e bypass de middleware em dev (Scores 5.3 a 7.5 restritos ao ambiente de dev);
+     - `@vitest/mocker` / `vitest` (`GHSA-qxg6-89mg-rqv8`, `GHSA-xp26-3454-mjgp`): Injeção em mocks manuais em ambiente de teste;
+     - `undici` (`GHSA-4qv8-2p9j-2685`): Dependência de rede do ambiente JSDOM em testes;
+     - `source-map-js` (`GHSA-68fv-2mgg-jv7q`): Dependência de build de CSS.
 - **Procedimento Seguro de Correção:** Executar `npm audit fix` **sem a flag `--force`**, validando em seguida com `npm run lint && npm run test && npm run build` para garantir que atualizações do Zod e Vite não introduzam breaking changes.
 - **Status:** Aberta (Agendada para Sprint 2 — antecipada para estabilizar a base)
 
@@ -334,7 +334,7 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 
 ### VULN-010: Polling de 5min sem AbortController e Acúmulo de Requisições
 - **Classificação:** Resiliência & Qualidade de Software
-- **Severidade Calibrada:** Informativa / Qualidade — `CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` (Score: **3.7**)
+- **Severidade Calibrada:** Informativa / Baixa — `CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L` (Score: **2.9**)
 - **CWE / OWASP:** CWE-400 (Uncontrolled Resource Consumption) / OWASP A04:2021
 - **Local:** [`src/hooks/useVagas.ts:87-151, 161-174`](file:///c:/DEV/garimpo-dev/src/hooks/useVagas.ts#L87-L151)
 - **Análise Técnica:**  
@@ -345,12 +345,12 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 ---
 
 ### VULN-011: Ausência de Validação de Protocolo em URLs Externas (`javascript:`)
-- **Classificação:** Vulnerabilidade de Segurança (Baixo Impacto)
-- **Severidade Calibrada:** Baixa — `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N` (Score: **3.5**)
+- **Classificação:** Defesa em Profundidade & Hardening de URLs
+- **Severidade Calibrada:** Média — `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N` (Score: **4.3**)
 - **CWE / OWASP:** CWE-20, CWE-79 / OWASP A03:2021
-- **Local:** [`src/components/VagaDetalhesModal.tsx:69`](file:///c:/DEV/garimpo-dev/src/components/VagaDetalhesModal.tsx#L69), [`EventoCard.tsx:123`](file:///c:/DEV/garimpo-dev/src/components/EventoCard.tsx#L123), [`EventoDetalhesModal.tsx:113, 171`](file:///c:/DEV/garimpo-dev/src/components/EventoDetalhesModal.tsx#L113)
+- **Local:** [`src/components/VagaDetalhesModal.tsx:182`](file:///c:/DEV/garimpo-dev/src/components/VagaDetalhesModal.tsx#L182), [`src/components/VagaCard.tsx:142`](file:///c:/DEV/garimpo-dev/src/components/VagaCard.tsx#L142), [`src/components/EventoCard.tsx:123`](file:///c:/DEV/garimpo-dev/src/components/EventoCard.tsx#L123), [`src/components/EventoDetalhesModal.tsx:113, 171`](file:///c:/DEV/garimpo-dev/src/components/EventoDetalhesModal.tsx#L113)
 - **Análise Técnica:**  
-  Navegadores modernos **não executam scripts via protocolo `javascript:` em tags `<img src>`**. O risco real restringe-se a elementos de link `<a href="...">` caso campos de URL vindos da API externa contenham payloads maliciosos. No caso dos eventos, os dados são estáticos e confiáveis (`src/data/eventos.ts`). Para links dinâmicos de vagas (`vaga.redirectLink`), a validação de esquema de protocolo (`https:` exclusivo) elimina o risco.
+  Uma busca completa (`grep`) por `href={` em todo o código-fonte confirma que nenhum elemento `<a href>` recebe strings dinâmicas cruas vindas da API externa. Os links de vagas passam obrigatoriamente pela função `buildVagaUrl(vaga.slug, vaga.id)` (linhas 182 de `VagaDetalhesModal.tsx` e 142 de `VagaCard.tsx`), enquanto links de eventos (`evento.linkInscricao`, `evento.mapaUrl`) provêm de dados estáticos auditados em `src/data/eventos.ts`. Além disso, especificações de navegadores modernos não executam scripts via protocolo `javascript:` em tags `<img src>`. Dessa forma, o achado não constitui vulnerabilidade explorável em produção, mas sim uma medida de **Hardening defensivo** para garantir que qualquer expansão futura de links valide estritamente o esquema `https:` (ou `mailto:`).
 - **Correção Proposta:** Criar função utilitária `sanitizarUrlExterna(url)` que autorize unicamente URLs iniciando com `https://` (ou `mailto:`), descartando qualquer outro esquema.
 - **Status:** Aberta (Agendada para Sprint 4)
 
@@ -370,7 +370,7 @@ A auditoria também executou testes nos pontos de entrada onde **nenhuma vulnera
 
 ### VULN-013: Exposição de Objetos de Erro de Rede em Logs de Console
 - **Classificação:** Higiene Operacional & Qualidade de Código
-- **Severidade Calibrada:** Informativa — `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` (Score: **2.4**)
+- **Severidade Calibrada:** Baixa — `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` (Score: **4.0**)
 - **CWE / OWASP:** CWE-532 / OWASP A09:2021
 - **Local:** [`src/services/solides.ts:46, 56, 120`](file:///c:/DEV/garimpo-dev/src/services/solides.ts#L46)
 - **Análise Técnica:**  
